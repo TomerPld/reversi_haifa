@@ -56,11 +56,9 @@ class UI:
             index = 12 * x + y
             print('index', index)
             if self.board.state.matrix[index] == MatrixValues.neighbor:
-                self.board.state.matrix[index] = MatrixValues(self.board.state.turn + 1)
+                self.board.player_action(index, self)
                 self.wait_for_player = False
-                self.board.next_turn()
-                self.board.clear_neighbors()
-                self.draw_board()
+                self.board.turn_loop(self)
             # self.buttons[12 * x + y].config(bg="red")
         
     def draw_board(self):
