@@ -38,8 +38,11 @@ def main():
     args = parser.parse_args()
 
     board = Board()
+    ui = UI(board)
 
     min_max = MinMax(board, heuristic_funcion, args.max_depth)
+	
+    ui.loop()
     print()
     
     

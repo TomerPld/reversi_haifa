@@ -3,7 +3,9 @@ from tkinter import *
 from board import PlayerOptions
 
 class UI:
-    def __init__(self):
+    def __init__(self, board):
+        self.board = board
+        
         self.master = Tk(className='Othello')
         self.frame = Frame(self.master)
         self.frame.grid(row=0,column=0)
@@ -12,7 +14,7 @@ class UI:
         self.buttons = []
         for i in range(12):
             for j in range(12):
-                button = Button(self.frame, text="      ", command= lambda x=i, y=j: self.color_change(x,y))			
+                button = Button(self.frame, text="      ", command= lambda x=i, y=j: self.player_action(x,y))			
                 button.grid(column=i,row=j)	
                 self.buttons.append(button)	
         
@@ -39,9 +41,8 @@ class UI:
     def loop(self):
         self.master.mainloop()
     
-    def color_change(self,x,y):
+    def player_action(self,x,y):
         self.buttons[12 * x + y].config(bg="red")
-        print(x,y)
         
 
     def draw_board(board):

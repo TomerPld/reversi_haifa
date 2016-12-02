@@ -10,14 +10,26 @@ class PlayerOptions(IntEnum):
 
 class State:
     def __init__(self):
-        pass
+        self.matrix = []
+        self.turn = 0
 
+    def init_state(self):
+        for i in range(12):
+            for j in range(12):
+                if (i, j) in [(5,6), (6, 5)]:
+                    self.matrix.append(1)
+                elif (i, j) in [(5, 5), (6, 6)]:
+                    self.matrix.append(2)
+                else:
+                    self.matrix.append(0)
+        self.turn = 0
+        return self
 
 class Board:
-    def __init__(self, init_state=None):
-        self.state = init_state
-        self.init_state = init_state
-
+    def __init__(self):
+        self.init_state = State().init_state()
+        self.state = self.init_state
+        
     def reset(self):
         self.state = self.init_state
 
@@ -27,4 +39,6 @@ class Board:
     def set_state(self, state):
         self.state = state
 
+    def next_turn(self):
+        self.state.turn = 1 - self.state.turn
 		
