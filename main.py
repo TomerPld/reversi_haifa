@@ -37,11 +37,8 @@ def main():
     # parser.add_argument('image_file', help='image file name full path')
     args = parser.parse_args()
 
-    board = Board()
+    board = Board(heuristic_funcion)
     ui = UI(board)
-
-    min_max = MinMax(board, heuristic_funcion, args.max_depth)
-	
     ui.loop()
     print()
     

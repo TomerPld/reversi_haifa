@@ -18,23 +18,37 @@ class UI:
             for j in range(12):
                 # button = Button(self.frame, text="      ", command= lambda x=i, y=j: self.player_action(x,y))			
                 button = Button(self.frame, text='{:3d}'.format(i * 12 + j), command= lambda x=i, y=j: self.player_action(x,y))			
-                button.grid(column=j,row=i)	
+                button.grid(column=j, row=i)	
                 self.buttons.append(button)	
         
         # set the options menu
         self.players = [PlayerOptions.Player, PlayerOptions.Player]
         self.player_buttons = []
         label_player_1 = Label(self.frame, text="Toggle Player 1")
-        label_player_1.grid(column=12,row=0)	
+        label_player_1.grid(column=12, row=0)	
         player_1_button = Button(self.frame, text=self.players[0].name, command=lambda x=0: self.toggle(x))
-        player_1_button.grid(column=12,row=1)
+        player_1_button.grid(column=12, row=1)
         self.player_buttons.append(player_1_button)
 
         label_player_2 = Label(self.frame, text="Toggle Player 2")
-        label_player_2.grid(column=12,row=2)	
+        label_player_2.grid(column=12, row=2)	
         player_2_button = Button(self.frame, text=self.players[1].name, command=lambda x=1: self.toggle(x))
-        player_2_button.grid(column=12,row=3)	
+        player_2_button.grid(column=12, row=3)
         self.player_buttons.append(player_2_button)
+        
+        label_reset = Label(self.frame, text="Reset the game")
+        label_reset.grid(column=12, row=4)	
+        reset_button = Button(self.frame, text="Reset", command=self.reset)
+        reset_button.grid(column=12, row=5)
+        
+        label_depth_text = Label(self.frame, text="change heuristic funcion depth")
+        label_depth_text.grid(column=12, row=6)	
+        label_depth = Label(self.frame, text=str(self.board.max_depth))
+        label_depth.grid(column=12, row=8)	
+        increase_depth_button = Button(self.frame, text=" /\ ", command=lambda label=label_depth: self.increase_depth(label))
+        increase_depth_button.grid(column=12, row=7)
+        decrease_depth_button = Button(self.frame, text=" \/ ", command=lambda label=label_depth: self.decrease_depth(label))
+        decrease_depth_button.grid(column=12, row=9)
         
         self.board.turn_loop(self)
         
@@ -70,3 +84,15 @@ class UI:
         for i in range(144):
             self.buttons[i].config(bg=colors[self.board.state.matrix[i]])
     
+    def reset(self):
+        self.board.reset()
+      
+    def increase_depth(self, label):
+        self.board.max_depth += 1
+        label.config(text=str(self.board.max_depth))
+
+    def decrease_depth(self, label):
+        if self.board.max_depth > 1:
+            self.board.max_depth -= 1
+            label.config(text=str(self.board.max_depth))
+   
