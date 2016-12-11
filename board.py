@@ -9,6 +9,7 @@ class State:
     def __init__(self):
         self.matrix = []
         self.turn = MatrixValues.player_1
+        self.last_index = None
 
     def init_state(self):
         for i in range(12):
@@ -26,9 +27,10 @@ class State:
         return MatrixValues.player_1 if self.turn == MatrixValues.player_2 else MatrixValues.player_2
 
 class Board:
-    def __init__(self, heuristic_funcion=None):
+    def __init__(self, heuristic_funcion=None, heuristic_funcion2=None):
         self.state = State().init_state()
         self.heuristic_funcion = heuristic_funcion
+        self.heuristic_funcion2 = heuristic_funcion2
         self.max_depth = 3
         
     def reset(self, ui):
@@ -49,7 +51,6 @@ class Board:
         for i in range(144):
             # find a 'stone' of the current player
             if state.matrix[i] == state.turn:
-                print('own: ', i)
                 
                 # merge the neighbors of this 'stone' with the one we have found thus far
                 neighbors |= Board._get_neighbors_indexes(state, i)
@@ -69,7 +70,6 @@ class Board:
                         break
                     pointer -= 12
                 if pointer >= 0 and state.matrix[pointer] == MatrixValues.empty:
-                    print('found ', pointer, 'searching up')
                     neighbors.add(pointer)
         
         # search down
@@ -81,7 +81,6 @@ class Board:
                         break
                     pointer += 12
                 if pointer < 144 and state.matrix[pointer] == MatrixValues.empty:
-                    print('found ', pointer, 'searching down')
                     neighbors.add(pointer)
         
         # search right
@@ -93,7 +92,6 @@ class Board:
                         break
                     pointer += 1
                 if pointer % 12 != 0 and state.matrix[pointer] == MatrixValues.empty:
-                    print('found ', pointer, 'searching right')
                     neighbors.add(pointer)
         
         # search left
@@ -105,7 +103,6 @@ class Board:
                         break
                     pointer -= 1
                 if pointer % 12 != 11 and state.matrix[pointer] == MatrixValues.empty:
-                    print('found ', pointer, 'searching left')
                     neighbors.add(pointer)
         
         # search up-left
@@ -117,7 +114,6 @@ class Board:
                         break
                     pointer = pointer - 1 - 12
                 if pointer % 12 != 11 and pointer >= 0 and state.matrix[pointer] == MatrixValues.empty:
-                    print('found ', pointer, 'searching up-left')
                     neighbors.add(pointer)
         
         # search up-right
@@ -129,7 +125,6 @@ class Board:
                         break
                     pointer = pointer + 1 - 12
                 if pointer % 12 != 0 and pointer >= 0 and state.matrix[pointer] == MatrixValues.empty:
-                    print('found ', pointer, 'searching up-right')
                     neighbors.add(pointer)
         
         # search down-left
@@ -141,19 +136,17 @@ class Board:
                         break
                     pointer = pointer - 1 + 12
                 if pointer % 12 != 11 and pointer < 144 and state.matrix[pointer] == MatrixValues.empty:
-                    print('found ', pointer, 'searching down-left')
                     neighbors.add(pointer)
         
         # search down-right
         if index % 12 != 11 and index < 132:
-            pointer = index + 1 - 12
+            pointer = index + 1 + 12
             if state.matrix[pointer] == opponent:
                 while pointer % 12 != 0 and pointer < 144:
                     if state.matrix[pointer] != opponent:
                         break
                     pointer = pointer + 1 + 12
                 if pointer % 12 != 0 and pointer < 144 and state.matrix[pointer] == MatrixValues.empty:
-                    print('found ', pointer, 'searching down-right')
                     neighbors.add(pointer)
         
         return neighbors
@@ -172,13 +165,14 @@ class Board:
             board = Board()
             board.state.matrix = self.state.matrix.copy()
             board.state.turn = self.state.turn
+            board.state.last_index = neighbor
             
             opponents = Board._get_opponents_to_fill(board.state, neighbor)
             own_value = self.state.turn
             for opponent in opponents:
                 board.state.matrix[opponent] = own_value
             board.state.matrix[neighbor] = own_value  
-            # board.next_turn()
+            board.next_turn()
             boards.append(board)
             
         
@@ -328,6 +322,7 @@ class Board:
         for opponent in opponents:
             self.state.matrix[opponent] = own_value
         self.state.matrix[index] = own_value
+        self.state.last_index = index
 
         self.next_turn()
         Board.clear_neighbors(self.state)
@@ -366,8 +361,6 @@ class Board:
     def turn_loop(self, ui):
         print()
         print('turn: ', self.state.turn)
-        print('players: ', ui.players)
-        print()
         print()
         players = ui.players
         
@@ -376,34 +369,64 @@ class Board:
             print('winner', winner)
             ui.winner = winner
             ui.draw_board()
-            
+            return
+
+        neighbors = Board.get_neighbors(self.state)
+        if len(neighbors) == 0:
+            # no possible moves, skip turn
+            ui.draw_board()
+            self.next_turn()
+            print('Skipping, call turn loop')
+            self.turn_loop(ui)
             return
 
         if players[self.state.turn.value - 1] == PlayerOptions.Player:
             # it's a player's turn, mark his possible moves and wait for his action
-            ui.wait_for_player = True
-
-            neighbors = Board.get_neighbors(self.state)
-        
-            # mark all of the neighbors
             for neighbor in neighbors:
                 self.state.matrix[neighbor] = MatrixValues.neighbor
+            ui.wait_for_player = True
             
         elif players[self.state.turn.value - 1] == PlayerOptions.MinMax:
+            if self.state.turn == MatrixValues.player_2 and players[0] == players[1]:
+                # both players are AI, use 2nd heuristic funcion for the second player
+                heuristic_funcion = self.heuristic_funcion2
+            else:
+                heuristic_funcion = self.heuristic_funcion
+            
             # call minmax
             print('call minmax')
-            best, best_path = min_max(self, 1, self.heuristic_funcion, self.max_depth)
+            current_turn =  self.state.turn
+            best, best_path = min_max(self, 1, heuristic_funcion, self.max_depth + 1)
             print('returned from minmax')
             if len(best_path) > 0:
                 # extract the next state to use
                 self.state = best_path[-1].state
+                self.state.turn = current_turn
             print('best', best)
+            print('best_path', len(best_path))
             
             self.next_turn()
             Board.clear_neighbors(self.state)
+
         elif players[self.state.turn.value - 1] == PlayerOptions.MinMaxAlphaBeta:
+            if self.state.turn == MatrixValues.player_2 and players[0] == players[1]:
+                # both players are AI, use 2nd heuristic funcion for the second player
+                heuristic_funcion = self.heuristic_funcion2
+            else:
+                heuristic_funcion = self.heuristic_funcion
+
             # call MinMaxAlphaBeta
-            pass
+            print('call MinMaxAlphaBeta')
+            current_turn =  self.state.turn
+            best, best_path = min_max_alpha_beta(self, 1, heuristic_funcion, self.max_depth + 1, -float('inf'), float('inf'))
+            print('returned from MinMaxAlphaBeta')
+            if len(best_path) > 0:
+                # extract the next state to use
+                self.state = best_path[-1].state
+                self.state.turn = current_turn
+            print('best', best)
+            print('best_path', len(best_path))
+            
             self.next_turn()
             Board.clear_neighbors(self.state)
 

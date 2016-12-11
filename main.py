@@ -27,7 +27,7 @@ def main():
     # parser.add_argument('image_file', help='image file name full path')
     args = parser.parse_args()
 
-    board = Board(heuristic_funcion)
+    board = Board(heuristic_funcion, heuristic_funcion2)
     ui = UI(board)
     ui.loop()
     print()
