@@ -259,7 +259,7 @@ class Board:
         if index % 12 != 0 and index >= 12:
             pointer = index - 1 - 12
             if state.matrix[pointer] == opponent:
-                while pointer % 12 != 11 and index >= 0:
+                while pointer % 12 != 11 and pointer >= 0:
                     if state.matrix[pointer] == opponent:
                         up_left_points.append(pointer)
                     elif state.matrix[pointer] == own_value:
@@ -275,7 +275,7 @@ class Board:
         if index % 12 != 11 and index >= 12:
             pointer = index + 1 - 12
             if state.matrix[pointer] == opponent:
-                while pointer % 12 != 0 and index >= 0:
+                while pointer % 12 != 0 and pointer >= 0:
                     if state.matrix[pointer] == opponent:
                         up_right_points.append(pointer)
                     elif state.matrix[pointer] == own_value:
@@ -291,7 +291,7 @@ class Board:
         if index % 12 != 0 and index < 132:
             pointer = index - 1 + 12
             if state.matrix[pointer] == opponent:
-                while pointer % 12 != 11 and index < 144:
+                while pointer % 12 != 11 and pointer < 144:
                     if state.matrix[pointer] == opponent:
                         down_left_points.append(pointer)
                     elif state.matrix[pointer] == own_value:
@@ -307,7 +307,7 @@ class Board:
         if index % 12 != 11 and index < 132:
             pointer = index + 1 + 12
             if state.matrix[pointer] == opponent:
-                while pointer % 12 != 0 and index < 144:
+                while pointer % 12 != 0 and pointer < 144:
                     if state.matrix[pointer] == opponent:
                         down_right_points.append(pointer)
                     elif state.matrix[pointer] == own_value:
@@ -373,6 +373,7 @@ class Board:
         
         winner = Board.get_winner(self.state)
         if winner is not None:
+            print('winner', winner)
             ui.winner = winner
             ui.draw_board()
             

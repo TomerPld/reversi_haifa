@@ -39,18 +39,21 @@ class UI:
         self.player_buttons.append(player_2_button)
         
         label_reset = Label(self.frame, text="Reset the game")
-        label_reset.grid(column=12, row=4)	
+        label_reset.grid(column=12, row=4)
         reset_button = Button(self.frame, text="Reset", command=self.reset)
         reset_button.grid(column=12, row=5)
         
         label_depth_text = Label(self.frame, text="change heuristic funcion depth")
-        label_depth_text.grid(column=12, row=6)	
+        label_depth_text.grid(column=12, row=6)
         label_depth = Label(self.frame, text=str(self.board.max_depth))
-        label_depth.grid(column=12, row=8)	
+        label_depth.grid(column=12, row=8)
         increase_depth_button = Button(self.frame, text=" /\ ", command=lambda label=label_depth: self.increase_depth(label))
         increase_depth_button.grid(column=12, row=7)
         decrease_depth_button = Button(self.frame, text=" \/ ", command=lambda label=label_depth: self.decrease_depth(label))
         decrease_depth_button.grid(column=12, row=9)
+
+        # placeholder for the winner label
+        self.label_winner = None
         
         self.board.turn_loop(self)
         
@@ -87,10 +90,13 @@ class UI:
             self.buttons[i].config(bg=colors[self.board.state.matrix[i]])
         if self.winner is not None:
            # print winner here...
-           pass 
+           self.label_winner = Label(self.frame, text=str(self.winner.name + ' WINS!')) 
+           self.label_winner.grid(column=3, row=3, columnspan=6, rowspan=6)	
         self.master.update_idletasks()
 	
     def reset(self):
+        if self.label_winner is not None:
+            self.label_winner.grid_remove()
         self.board.reset(self)
       
     def increase_depth(self, label):
