@@ -1,3 +1,5 @@
+import time
+
 from enums import *
 from min_max import min_max
 from min_max_alpha_beta import min_max_alpha_beta
@@ -29,8 +31,11 @@ class Board:
         self.heuristic_funcion = heuristic_funcion
         self.max_depth = 3
         
-    def reset(self):
+    def reset(self, ui):
         self.state = State().init_state()
+        ui.wait_for_player = False
+        ui.winner = None
+        self.turn_loop(ui)
 
     @staticmethod
     def clear_neighbors(state):
@@ -366,6 +371,12 @@ class Board:
         print()
         players = ui.players
         
+        winner = Board.get_winner(self.state)
+        if winner is not None:
+            ui.winner = winner
+            ui.draw_board()
+            
+            return
 
         if players[self.state.turn.value - 1] == PlayerOptions.Player:
             # it's a player's turn, mark his possible moves and wait for his action

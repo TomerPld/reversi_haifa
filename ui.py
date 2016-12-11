@@ -6,6 +6,7 @@ from enums import *
 class UI:
     def __init__(self, board):
         self.board = board
+        self.winner = None
         self.wait_for_player = False
         
         # create the main window
@@ -84,9 +85,13 @@ class UI:
                   MatrixValues.neighbor: 'yellow'}
         for i in range(144):
             self.buttons[i].config(bg=colors[self.board.state.matrix[i]])
-    
+        if self.winner is not None:
+           # print winner here...
+           pass 
+        self.master.update_idletasks()
+	
     def reset(self):
-        self.board.reset()
+        self.board.reset(self)
       
     def increase_depth(self, label):
         self.board.max_depth += 1
