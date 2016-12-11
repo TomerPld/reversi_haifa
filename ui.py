@@ -1,6 +1,7 @@
 from tkinter import *
 
-from board import PlayerOptions, MatrixValues
+from board import PlayerOptions
+from enums import *
 
 class UI:
     def __init__(self, board):

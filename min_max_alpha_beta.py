@@ -1,3 +1,4 @@
+from enums import *
 
 
 def min_max_alpha_beta(state, depth, heuristic_funcion, max_depth, board, alpha, beta):
@@ -8,6 +9,7 @@ def min_max_alpha_beta(state, depth, heuristic_funcion, max_depth, board, alpha,
     
     if depth % 2 != 0:
         best = -float('inf')
+        best_path = []
         while len(successors) > 0 or alpha > beta:
             m = successors.pop()
             value, path = min_max(m, deph + 1, heuristic_funcion, max_depth, board, alpha, beta)                
@@ -20,6 +22,7 @@ def min_max_alpha_beta(state, depth, heuristic_funcion, max_depth, board, alpha,
 
     elif depth % 2 == 0:
         best = float('inf')
+        best_path = []
         while len(successors) > 0 or alpha > beta:
             m = successors.pop()
             value, path = min_max(m, deph + 1, heuristic_funcion, max_depth, board, alpha, beta)                

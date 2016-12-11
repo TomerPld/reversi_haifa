@@ -2,9 +2,7 @@ import argparse
 
 from ui import *
 from board import *
-from min_max import *
-from min_max_alpha_beta import *
-from ui import *
+from heuristic import *
 
 # Reversi 12x12
 # AI vs AI (2 different heuristic funcions)
@@ -22,14 +20,6 @@ from ui import *
 # whre W/B states who's turn (black writes W, white writes B)
 # This way we can play against other students
 
-def heuristic_funcion(state, depth):
-    win = float('inf')
-    loss = -float('inf')
-    
-    
-    
-    
-    return 0
 
 def main():
     parser = argparse.ArgumentParser()

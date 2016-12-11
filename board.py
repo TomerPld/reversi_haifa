@@ -1,25 +1,12 @@
-from enum import IntEnum, Enum
+from enums import *
 from min_max import min_max
 from min_max_alpha_beta import min_max_alpha_beta
 
-class PlayerOptions(IntEnum):
-    Player = 0
-    MinMax = 1
-    MinMaxAlphaBeta = 2
 
-    def get_next(current):
-        return PlayerOptions((current.value + 1) % len(PlayerOptions.__members__.items()))
-
-class MatrixValues(Enum):
-    empty = 0
-    player_1 = 1
-    player_2 = 2
-    neighbor = 3
-		
 class State:
     def __init__(self):
         self.matrix = []
-        self.turn = 0
+        self.turn = MatrixValues.player_1
 
     def init_state(self):
         for i in range(12):
@@ -30,8 +17,11 @@ class State:
                     self.matrix.append(MatrixValues.player_2)
                 else:
                     self.matrix.append(MatrixValues.empty)
-        self.turn = 0
+        self.turn = MatrixValues.player_1
         return self
+		
+    def get_opponent(self):
+        return MatrixValues.player_1 if self.turn == MatrixValues.player_2 else MatrixValues.player_2
 
 class Board:
     def __init__(self, heuristic_funcion=None):
@@ -42,159 +32,168 @@ class Board:
     def reset(self):
         self.state = State().init_state()
 
-    def clear_neighbors(self):
+    @staticmethod
+    def clear_neighbors(state):
         for i in range(144):
-            if self.state.matrix[i] == MatrixValues.neighbor:
-                self.state.matrix[i] = MatrixValues.empty
-        
-    def get_neighbors(self):
+            if state.matrix[i] == MatrixValues.neighbor:
+                state.matrix[i] = MatrixValues.empty
+
+    @staticmethod
+    def get_neighbors(state):
         neighbors = set()
         for i in range(144):
             # find a 'stone' of the current player
-            if self.state.matrix[i] == MatrixValues(self.state.turn + 1):
+            if state.matrix[i] == state.turn:
                 print('own: ', i)
                 
                 # merge the neighbors of this 'stone' with the one we have found thus far
-                neighbors |= self._get_neighbors_indexes(i)
+                neighbors |= Board._get_neighbors_indexes(state, i)
         return neighbors
 
-    def _get_neighbors_indexes(self, index):
+    @staticmethod
+    def _get_neighbors_indexes(state, index):
         neighbors = set()
-        opponent = MatrixValues.player_1 if self.state.turn == 1 else MatrixValues.player_2
+        opponent = state.get_opponent()
  
         # search up
         if index >= 12:
             pointer = index - 12
-            if self.state.matrix[pointer] == opponent:
+            if state.matrix[pointer] == opponent:
                 while pointer >= 0:
-                    if self.state.matrix[pointer] != opponent:
+                    if state.matrix[pointer] != opponent:
                         break
                     pointer -= 12
-                if pointer >= 0 and self.state.matrix[pointer] == MatrixValues.empty:
+                if pointer >= 0 and state.matrix[pointer] == MatrixValues.empty:
                     print('found ', pointer, 'searching up')
                     neighbors.add(pointer)
         
         # search down
         if index < 132:
             pointer = index + 12
-            if self.state.matrix[pointer] == opponent:
+            if state.matrix[pointer] == opponent:
                 while pointer < 144:
-                    if self.state.matrix[pointer] != opponent:
+                    if state.matrix[pointer] != opponent:
                         break
                     pointer += 12
-                if pointer < 144 and self.state.matrix[pointer] == MatrixValues.empty:
+                if pointer < 144 and state.matrix[pointer] == MatrixValues.empty:
                     print('found ', pointer, 'searching down')
                     neighbors.add(pointer)
         
         # search right
         if index % 12 != 11:
             pointer = index + 1
-            if self.state.matrix[pointer] == opponent:
+            if state.matrix[pointer] == opponent:
                 while pointer % 12 != 0:
-                    if self.state.matrix[pointer] != opponent:
+                    if state.matrix[pointer] != opponent:
                         break
                     pointer += 1
-                if pointer % 12 != 0 and self.state.matrix[pointer] == MatrixValues.empty:
+                if pointer % 12 != 0 and state.matrix[pointer] == MatrixValues.empty:
                     print('found ', pointer, 'searching right')
                     neighbors.add(pointer)
         
         # search left
         if index % 12 != 0:
             pointer = index - 1
-            if self.state.matrix[pointer] == opponent:
+            if state.matrix[pointer] == opponent:
                 while pointer % 12 != 11:
-                    if self.state.matrix[pointer] != opponent:
+                    if state.matrix[pointer] != opponent:
                         break
                     pointer -= 1
-                if pointer % 12 != 11 and self.state.matrix[pointer] == MatrixValues.empty:
+                if pointer % 12 != 11 and state.matrix[pointer] == MatrixValues.empty:
                     print('found ', pointer, 'searching left')
                     neighbors.add(pointer)
         
         # search up-left
         if index % 12 != 0 and index >= 12:
             pointer = index - 1 - 12
-            if self.state.matrix[pointer] == opponent:
+            if state.matrix[pointer] == opponent:
                 while pointer % 12 != 11 and pointer >= 0:
-                    if self.state.matrix[pointer] != opponent:
+                    if state.matrix[pointer] != opponent:
                         break
                     pointer = pointer - 1 - 12
-                if pointer % 12 != 11 and pointer >= 0 and self.state.matrix[pointer] == MatrixValues.empty:
+                if pointer % 12 != 11 and pointer >= 0 and state.matrix[pointer] == MatrixValues.empty:
                     print('found ', pointer, 'searching up-left')
                     neighbors.add(pointer)
         
         # search up-right
         if index % 12 != 11 and index >= 12:
             pointer = index + 1 - 12
-            if self.state.matrix[pointer] == opponent:
+            if state.matrix[pointer] == opponent:
                 while pointer % 12 != 0 and pointer >= 0:
-                    if self.state.matrix[pointer] != opponent:
+                    if state.matrix[pointer] != opponent:
                         break
                     pointer = pointer + 1 - 12
-                if pointer % 12 != 0 and pointer >= 0 and self.state.matrix[pointer] == MatrixValues.empty:
+                if pointer % 12 != 0 and pointer >= 0 and state.matrix[pointer] == MatrixValues.empty:
                     print('found ', pointer, 'searching up-right')
                     neighbors.add(pointer)
         
         # search down-left
         if index % 12 != 0 and index < 132:
             pointer = index - 1 + 12
-            if self.state.matrix[pointer] == opponent:
+            if state.matrix[pointer] == opponent:
                 while pointer % 12 != 11 and pointer < 144:
-                    if self.state.matrix[pointer] != opponent:
+                    if state.matrix[pointer] != opponent:
                         break
                     pointer = pointer - 1 + 12
-                if pointer % 12 != 11 and pointer < 144 and self.state.matrix[pointer] == MatrixValues.empty:
+                if pointer % 12 != 11 and pointer < 144 and state.matrix[pointer] == MatrixValues.empty:
                     print('found ', pointer, 'searching down-left')
                     neighbors.add(pointer)
         
         # search down-right
         if index % 12 != 11 and index < 132:
             pointer = index + 1 - 12
-            if self.state.matrix[pointer] == opponent:
+            if state.matrix[pointer] == opponent:
                 while pointer % 12 != 0 and pointer < 144:
-                    if self.state.matrix[pointer] != opponent:
+                    if state.matrix[pointer] != opponent:
                         break
                     pointer = pointer + 1 + 12
-                if pointer % 12 != 0 and pointer < 144 and self.state.matrix[pointer] == MatrixValues.empty:
+                if pointer % 12 != 0 and pointer < 144 and state.matrix[pointer] == MatrixValues.empty:
                     print('found ', pointer, 'searching down-right')
                     neighbors.add(pointer)
         
         return neighbors
 
     def get_neighbors_states(self):
-        neighbors = self.get_neighbors()
-        states = []
-        board = Board()
+        neighbors = Board.get_neighbors(self.state)
+        
+        # mark all of the neighbors
+        for neighbor in neighbors:
+            self.state.matrix[neighbor] = MatrixValues.neighbor
+			
+        print('neighbors', neighbors)
+        boards = []
         
         for neighbor in neighbors:
-            board.state = State()
+            board = Board()
             board.state.matrix = self.state.matrix.copy()
             board.state.turn = self.state.turn
             
-            opponents = board._get_opponents_to_fill(neighbor)
-            own_value = MatrixValues(self.state.turn + 1)
+            opponents = Board._get_opponents_to_fill(board.state, neighbor)
+            own_value = self.state.turn
             for opponent in opponents:
                 board.state.matrix[opponent] = own_value
             board.state.matrix[neighbor] = own_value  
-            board.next_turn()
-            states.append(board.state)
+            # board.next_turn()
+            boards.append(board)
             
         
-        return states
+        return boards
  
-    def _get_opponents_to_fill(self, index):
-        own_value = MatrixValues(self.state.turn + 1)
-        opponent = MatrixValues((1 - self.state.turn) + 1)
+    @staticmethod 
+    def _get_opponents_to_fill(state, index):
+        own_value = state.turn
+        opponent = state.get_opponent()
         opponents = []
         
         # fill up
         up_points = []
         if index >= 12:
             pointer = index - 12
-            if self.state.matrix[pointer] == opponent:
+            if state.matrix[pointer] == opponent:
                 while pointer >= 0:
-                    if self.state.matrix[pointer] == opponent:
+                    if state.matrix[pointer] == opponent:
                         up_points.append(pointer)
-                    elif self.state.matrix[pointer] == own_value:
+                    elif state.matrix[pointer] == own_value:
                         for point in up_points:
                             opponents.append(point)
                         break
@@ -206,11 +205,11 @@ class Board:
         down_points = []
         if index < 132:
             pointer = index + 12
-            if self.state.matrix[pointer] == opponent:
+            if state.matrix[pointer] == opponent:
                 while pointer < 144:
-                    if self.state.matrix[pointer] == opponent:
+                    if state.matrix[pointer] == opponent:
                         down_points.append(pointer)
-                    elif self.state.matrix[pointer] == own_value:
+                    elif state.matrix[pointer] == own_value:
                         for point in down_points:
                             opponents.append(point)
                         break
@@ -222,11 +221,11 @@ class Board:
         right_points = []
         if index % 12 != 11:
             pointer = index + 1
-            if self.state.matrix[pointer] == opponent:
+            if state.matrix[pointer] == opponent:
                 while pointer % 12 != 0:
-                    if self.state.matrix[pointer] == opponent:
+                    if state.matrix[pointer] == opponent:
                         right_points.append(pointer)
-                    elif self.state.matrix[pointer] == own_value:
+                    elif state.matrix[pointer] == own_value:
                         for point in right_points:
                             opponents.append(point)
                         break
@@ -238,11 +237,11 @@ class Board:
         left_points = []
         if index % 12 != 0:
             pointer = index - 1
-            if self.state.matrix[pointer] == opponent:
+            if state.matrix[pointer] == opponent:
                 while pointer % 12 != 11:
-                    if self.state.matrix[pointer] == opponent:
+                    if state.matrix[pointer] == opponent:
                         left_points.append(pointer)
-                    elif self.state.matrix[pointer] == own_value:
+                    elif state.matrix[pointer] == own_value:
                         for point in left_points:
                             opponents.append(point)
                         break
@@ -254,11 +253,11 @@ class Board:
         up_left_points = []
         if index % 12 != 0 and index >= 12:
             pointer = index - 1 - 12
-            if self.state.matrix[pointer] == opponent:
+            if state.matrix[pointer] == opponent:
                 while pointer % 12 != 11 and index >= 0:
-                    if self.state.matrix[pointer] == opponent:
+                    if state.matrix[pointer] == opponent:
                         up_left_points.append(pointer)
-                    elif self.state.matrix[pointer] == own_value:
+                    elif state.matrix[pointer] == own_value:
                         for point in up_left_points:
                             opponents.append(point)
                         break
@@ -270,11 +269,11 @@ class Board:
         up_right_points = []
         if index % 12 != 11 and index >= 12:
             pointer = index + 1 - 12
-            if self.state.matrix[pointer] == opponent:
+            if state.matrix[pointer] == opponent:
                 while pointer % 12 != 0 and index >= 0:
-                    if self.state.matrix[pointer] == opponent:
+                    if state.matrix[pointer] == opponent:
                         up_right_points.append(pointer)
-                    elif self.state.matrix[pointer] == own_value:
+                    elif state.matrix[pointer] == own_value:
                         for point in up_right_points:
                             opponents.append(point)
                         break
@@ -286,11 +285,11 @@ class Board:
         down_left_points = []
         if index % 12 != 0 and index < 132:
             pointer = index - 1 + 12
-            if self.state.matrix[pointer] == opponent:
+            if state.matrix[pointer] == opponent:
                 while pointer % 12 != 11 and index < 144:
-                    if self.state.matrix[pointer] == opponent:
+                    if state.matrix[pointer] == opponent:
                         down_left_points.append(pointer)
-                    elif self.state.matrix[pointer] == own_value:
+                    elif state.matrix[pointer] == own_value:
                         for point in down_left_points:
                             opponents.append(point)
                         break
@@ -302,11 +301,11 @@ class Board:
         down_right_points = []
         if index % 12 != 11 and index < 132:
             pointer = index + 1 + 12
-            if self.state.matrix[pointer] == opponent:
+            if state.matrix[pointer] == opponent:
                 while pointer % 12 != 0 and index < 144:
-                    if self.state.matrix[pointer] == opponent:
+                    if state.matrix[pointer] == opponent:
                         down_right_points.append(pointer)
-                    elif self.state.matrix[pointer] == own_value:
+                    elif state.matrix[pointer] == own_value:
                         for point in down_right_points:
                             opponents.append(point)
                         break
@@ -317,16 +316,47 @@ class Board:
         return opponents
         
     def player_action(self, index, ui):
-        opponents = self._get_opponents_to_fill(index)
+        opponents = Board._get_opponents_to_fill(self.state, index)
         
         # fill the neighbor and opponents with your own value
-        own_value = MatrixValues(self.state.turn + 1)
+        own_value = self.state.turn
         for opponent in opponents:
             self.state.matrix[opponent] = own_value
         self.state.matrix[index] = own_value
 
         self.next_turn()
-        self.clear_neighbors()
+        Board.clear_neighbors(self.state)
+
+    @staticmethod
+    def get_winner(state):
+        player_1_counter = 0
+        player_2_counter = 0
+        
+        for i in range(144):
+            if state.matrix[i] == MatrixValues.player_1:
+                player_1_counter += 1
+            elif state.matrix[i] == MatrixValues.player_2:
+                player_2_counter += 1
+        
+        if player_1_counter == 0:
+            # player 1 eliminated, player 2 wins
+            return Winner.player_2
+        elif player_2_counter == 0:
+            # player 2 eliminated, player 1 wins
+            return Winner.player_1
+        elif player_1_counter + player_2_counter == 144:
+            if player_1_counter > player_2_counter:
+                # player 1 covered more board, player 1 wins
+                return Winner.player_1
+            elif player_2_counter > player_1_counter:
+                # player 2 covered more board, player 2 wins
+                return Winner.player_2
+            else:
+                # both players covered the same space, draw
+                return Winner.draw
+
+        # the match is not over
+        return None
 
     def turn_loop(self, ui):
         print()
@@ -335,38 +365,42 @@ class Board:
         print()
         print()
         players = ui.players
-        neighbors = self.get_neighbors()
         
-        # mark all of the neighbors
-        for neighbor in neighbors:
-            self.state.matrix[neighbor] = MatrixValues.neighbor
 
-        if players[self.state.turn] == PlayerOptions.Player:
+        if players[self.state.turn.value - 1] == PlayerOptions.Player:
             # it's a player's turn, mark his possible moves and wait for his action
             ui.wait_for_player = True
+
+            neighbors = Board.get_neighbors(self.state)
+        
+            # mark all of the neighbors
+            for neighbor in neighbors:
+                self.state.matrix[neighbor] = MatrixValues.neighbor
             
-        elif players[self.state.turn] == PlayerOptions.MinMax:
+        elif players[self.state.turn.value - 1] == PlayerOptions.MinMax:
             # call minmax
             print('call minmax')
-            best, best_path = min_max(self.state, 1, self.heuristic_funcion, self.max_depth, self)
+            best, best_path = min_max(self, 1, self.heuristic_funcion, self.max_depth)
+            print('returned from minmax')
             if len(best_path) > 0:
                 # extract the next state to use
-                self.state = best_path[-1]
+                self.state = best_path[-1].state
             print('best', best)
             
             self.next_turn()
-            self.clear_neighbors()
-        elif players[self.state.turn] == PlayerOptions.MinMaxAlphaBeta:
+            Board.clear_neighbors(self.state)
+        elif players[self.state.turn.value - 1] == PlayerOptions.MinMaxAlphaBeta:
             # call MinMaxAlphaBeta
             pass
             self.next_turn()
-            self.clear_neighbors()
+            Board.clear_neighbors(self.state)
 
         ui.draw_board()
-    
-    def set_state(self, state):
-        self.state = state
+        print(players[self.state.turn.value - 1])
+        if not ui.wait_for_player:
+            print('call turn loop')
+            self.turn_loop(ui)
 
     def next_turn(self):
-        self.state.turn = 1 - self.state.turn
+        self.state.turn = self.state.get_opponent()
 		
