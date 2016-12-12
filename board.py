@@ -366,7 +366,8 @@ class Board:
         if state.matrix[0] == state.turn:
             secured.add(0)
             i = 1
-            while i < 11:
+            consecutive = True
+            while i < 11 and consecutive:
                 j = i
                 line = set()
                 full_line = True
@@ -378,13 +379,33 @@ class Board:
                     j = j - 1 + 12
                 if full_line:
                     secured |= line
+                else:
+                    consecutive = False
                 i += 1
+            if consecutive:
+                i = 11
+                while i < 143 and consecutive:
+                    j = i
+                    line = set()
+                    full_line = True
+                    while j < 143 and full_line:
+                        if state.matrix[j] == state.turn:
+                            line.add(j)
+                        else:
+                            full_line = False
+                        j = j - 1 + 12
+                    if full_line:
+                        secured |= line
+                    else:
+                        consecutive = False
+                    i += 12
         
         # top-right corner
         if state.matrix[11] == state.turn:
             secured.add(11)
             i = 10
-            while i > 0:
+            consecutive = True
+            while i > 0 and consecutive:
                 j = i
                 line = set()
                 full_line = True
@@ -396,13 +417,33 @@ class Board:
                     j = j + 1 + 12
                 if full_line:
                     secured |= line
+                else:
+                    consecutive = False
                 i -= 1
+            if consecutive:
+                i = 0
+                while i < 132 and consecutive:
+                    j = i
+                    line = set()
+                    full_line = True
+                    while j < 143 and full_line:
+                        if state.matrix[j] == state.turn:
+                            line.add(j)
+                        else:
+                            full_line = False
+                        j = j + 1 + 12
+                    if full_line:
+                        secured |= line
+                    else:
+                        consecutive = False
+                    i += 12
         
         # bottom-left corner
         if state.matrix[132] == state.turn:
             secured.add(132)
             i = 133
-            while i < 143:
+            consecutive = True
+            while i < 143 and consecutive:
                 j = i
                 line = set()
                 full_line = True
@@ -414,13 +455,33 @@ class Board:
                     j = j - 1 - 12
                 if full_line:
                     secured |= line
+                else:
+                    consecutive = False
                 i += 1
+            if consecutive:
+                i = 143
+                while i > 11 and consecutive:
+                    j = i
+                    line = set()
+                    full_line = True
+                    while j < 143 and full_line:
+                        if state.matrix[j] == state.turn:
+                            line.add(j)
+                        else:
+                            full_line = False
+                        j = j - 1 - 12
+                    if full_line:
+                        secured |= line
+                    else:
+                        consecutive = False
+                    i -= 12
         
         # bottom-right corner
         if state.matrix[143] == state.turn:
             secured.add(143)
             i = 142
-            while i > 132:
+            consecutive = True
+            while i > 132 and consecutive:
                 j = i
                 line = set()
                 full_line = True
@@ -432,7 +493,26 @@ class Board:
                     j = j + 1 - 12
                 if full_line:
                     secured |= line
+                else:
+                    consecutive = False
                 i -= 1
+            if consecutive:
+                i = 132
+                while i > 0 and consecutive:
+                    j = i
+                    line = set()
+                    full_line = True
+                    while j < 143 and full_line:
+                        if state.matrix[j] == state.turn:
+                            line.add(j)
+                        else:
+                            full_line = False
+                        j = j + 1 - 12
+                    if full_line:
+                        secured |= line
+                    else:
+                        consecutive = False
+                    i -= 12
         
         # top edge
         i = 0
