@@ -358,6 +358,160 @@ class Board:
         # the match is not over
         return None
 
+    @staticmethod
+    def get_secured(state):
+        secured = set()
+        
+        # top-left corner
+        if state.matrix[0] == state.turn:
+            secured.add(0)
+            i = 1
+            while i < 11:
+                j = i
+                line = set()
+                full_line = True
+                while j % 12 != 11 and full_line:
+                    if state.matrix[j] == state.turn:
+                        line.add(j)
+                    else:
+                        full_line = False
+                    j = j - 1 + 12
+                if full_line:
+                    secured |= line
+                i += 1
+        
+        # top-right corner
+        if state.matrix[11] == state.turn:
+            secured.add(11)
+            i = 10
+            while i > 0:
+                j = i
+                line = set()
+                full_line = True
+                while j % 12 != 0 and full_line:
+                    if state.matrix[j] == state.turn:
+                        line.add(j)
+                    else:
+                        full_line = False
+                    j = j + 1 + 12
+                if full_line:
+                    secured |= line
+                i -= 1
+        
+        # bottom-left corner
+        if state.matrix[132] == state.turn:
+            secured.add(132)
+            i = 133
+            while i < 143:
+                j = i
+                line = set()
+                full_line = True
+                while j % 12 != 11 and full_line:
+                    if state.matrix[j] == state.turn:
+                        line.add(j)
+                    else:
+                        full_line = False
+                    j = j - 1 - 12
+                if full_line:
+                    secured |= line
+                i += 1
+        
+        # bottom-right corner
+        if state.matrix[143] == state.turn:
+            secured.add(143)
+            i = 142
+            while i > 132:
+                j = i
+                line = set()
+                full_line = True
+                while j % 12 != 0 and full_line:
+                    if state.matrix[j] == state.turn:
+                        line.add(j)
+                    else:
+                        full_line = False
+                    j = j + 1 - 12
+                if full_line:
+                    secured |= line
+                i -= 1
+        
+        # top edge
+        i = 0
+        consecutive = True
+        while i <= 132 and consecutive:
+            line = set()
+            full_line = True
+            j = 0
+            while j <= 11 and full_line:
+                if state.matrix[i + j] == state.turn:
+                    line.add(i + j)
+                else:
+                    full_line = False
+                j += 1
+            if full_line:
+                secured |= line
+            else:
+                consecutive = False
+            i += 12
+        
+        # bottom edge
+        i = 132
+        consecutive = True
+        while i >= 0 and consecutive:
+            line = set()
+            full_line = True
+            j = 0
+            while j <= 11 and full_line:
+                if state.matrix[i + j] == state.turn:
+                    line.add(i + j)
+                else:
+                    full_line = False
+                j += 1
+            if full_line:
+                secured |= line
+            else:
+                consecutive = False
+            i -= 12
+        
+        # left edge
+        i = 0
+        consecutive = True
+        while i <= 11 and consecutive:
+            line = set()
+            full_line = True
+            j = 0
+            while j <= 132 and full_line:
+                if state.matrix[i + j] == state.turn:
+                    line.add(i + j)
+                else:
+                    full_line = False
+                j += 12
+            if full_line:
+                secured |= line
+            else:
+                consecutive = False
+            i += 1
+        
+        # right edge
+        i = 11
+        consecutive = True
+        while i >= 0 and consecutive:
+            line = set()
+            full_line = True
+            j = 0
+            while j <= 132 and full_line:
+                if state.matrix[i + j] == state.turn:
+                    line.add(i + j)
+                else:
+                    full_line = False
+                j += 12
+            if full_line:
+                secured |= line
+            else:
+                consecutive = False
+            i -= 1
+        
+        return len(secured)
+
     def turn_loop(self, ui):
         print()
         print('turn: ', self.state.turn)
@@ -403,7 +557,7 @@ class Board:
                 self.state = best_path[-1].state
                 self.state.turn = current_turn
             print('best', best)
-            print('best_path', len(best_path))
+            print('best_path', [b.state.last_index for b in best_path])
             
             self.next_turn()
             Board.clear_neighbors(self.state)
@@ -425,7 +579,7 @@ class Board:
                 self.state = best_path[-1].state
                 self.state.turn = current_turn
             print('best', best)
-            print('best_path', len(best_path))
+            print('best_path', [b.state.last_index for b in best_path])
             
             self.next_turn()
             Board.clear_neighbors(self.state)

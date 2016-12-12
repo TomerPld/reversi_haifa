@@ -4,9 +4,9 @@ from enums import *
 def min_max(board, depth, heuristic_funcion, max_depth):
     static_value = heuristic_funcion(board, depth)
     print('  ' * depth, 'static_value', static_value)
-    if static_value in [float('inf'), -float('inf')] or depth >= max_depth:
-        return static_value, []
     successors = board.get_neighbors_states()
+    if len(successors) == 0 or depth >= max_depth:
+        return static_value, []
     print('  ' * depth, 'successors', len(successors))
     
     if depth % 2 != 0:
@@ -19,6 +19,7 @@ def min_max(board, depth, heuristic_funcion, max_depth):
                 best = value
                 best_path = path
                 best_path.append(m)
+        print('  ' * depth, 'best', best)
         return best, best_path
 
     elif depth % 2 == 0:
@@ -31,6 +32,7 @@ def min_max(board, depth, heuristic_funcion, max_depth):
                 best = value
                 best_path = path
                 best_path.append(m)
+        print('  ' * depth, 'best', best)
         return best, best_path
     
         
