@@ -32,6 +32,7 @@ class Board:
         self.heuristic_funcion = heuristic_funcion
         self.heuristic_funcion2 = heuristic_funcion2
         self.max_depth = 3
+        self.player_skipped = False
         
     def reset(self, ui):
         self.state = State().init_state()
@@ -324,6 +325,7 @@ class Board:
         self.state.matrix[index] = own_value
         self.state.last_index = index
 
+        ui.draw_board()
         self.next_turn()
         Board.clear_neighbors(self.state)
 
@@ -362,234 +364,78 @@ class Board:
     def get_secured(state):
         secured = set()
         
-        # top-left corner
+        # top-left
         if state.matrix[0] == state.turn:
             secured.add(0)
-            i = 1
-            consecutive = True
-            while i < 11 and consecutive:
-                j = i
-                line = set()
-                full_line = True
-                while j % 12 != 11 and full_line:
-                    if state.matrix[j] == state.turn:
-                        line.add(j)
+            i = 0
+            line_max = 12
+            while i <= 11 and line_max > 1:
+                consecutive_in_line = True
+                j = 0
+                while j <= line_max - 1 and consecutive_in_line:
+                    if state.matrix[12 * i + j] == state.turn:
+                        secured.add(12 * i + j)
+                        j += 1
                     else:
-                        full_line = False
-                    j = j - 1 + 12
-                if full_line:
-                    secured |= line
-                else:
-                    consecutive = False
+                        consecutive_in_line = False
+                if not consecutive_in_line:
+                    line_max = j - 1
                 i += 1
-            if consecutive:
-                i = 11
-                while i < 143 and consecutive:
-                    j = i
-                    line = set()
-                    full_line = True
-                    while j < 143 and full_line:
-                        if state.matrix[j] == state.turn:
-                            line.add(j)
-                        else:
-                            full_line = False
-                        j = j - 1 + 12
-                    if full_line:
-                        secured |= line
-                    else:
-                        consecutive = False
-                    i += 12
-        
-        # top-right corner
+         
+        # top-right
         if state.matrix[11] == state.turn:
             secured.add(11)
-            i = 10
-            consecutive = True
-            while i > 0 and consecutive:
-                j = i
-                line = set()
-                full_line = True
-                while j % 12 != 0 and full_line:
-                    if state.matrix[j] == state.turn:
-                        line.add(j)
+            i = 0
+            line_max = 0
+            while i <= 11 and line_max < 11:
+                consecutive_in_line = True
+                j = 11
+                while j >= line_max + 1 and consecutive_in_line:
+                    if state.matrix[12 * i + j] == state.turn:
+                        secured.add(12 * i + j)
+                        j -= 1
                     else:
-                        full_line = False
-                    j = j + 1 + 12
-                if full_line:
-                    secured |= line
-                else:
-                    consecutive = False
-                i -= 1
-            if consecutive:
-                i = 0
-                while i < 132 and consecutive:
-                    j = i
-                    line = set()
-                    full_line = True
-                    while j < 143 and full_line:
-                        if state.matrix[j] == state.turn:
-                            line.add(j)
-                        else:
-                            full_line = False
-                        j = j + 1 + 12
-                    if full_line:
-                        secured |= line
-                    else:
-                        consecutive = False
-                    i += 12
+                        consecutive_in_line = False
+                if not consecutive_in_line:
+                    line_max = j + 1
+                i += 1
         
-        # bottom-left corner
+        # bottom-left
         if state.matrix[132] == state.turn:
             secured.add(132)
-            i = 133
-            consecutive = True
-            while i < 143 and consecutive:
-                j = i
-                line = set()
-                full_line = True
-                while j % 12 != 11 and full_line:
-                    if state.matrix[j] == state.turn:
-                        line.add(j)
+            i = 11
+            line_max = 12
+            while i >= 0 and line_max > 1:
+                consecutive_in_line = True
+                j = 0
+                while j <= line_max - 1 and consecutive_in_line:
+                    if state.matrix[12 * i + j] == state.turn:
+                        secured.add(12 * i + j)
+                        j += 1
                     else:
-                        full_line = False
-                    j = j - 1 - 12
-                if full_line:
-                    secured |= line
-                else:
-                    consecutive = False
-                i += 1
-            if consecutive:
-                i = 143
-                while i > 11 and consecutive:
-                    j = i
-                    line = set()
-                    full_line = True
-                    while j < 143 and full_line:
-                        if state.matrix[j] == state.turn:
-                            line.add(j)
-                        else:
-                            full_line = False
-                        j = j - 1 - 12
-                    if full_line:
-                        secured |= line
-                    else:
-                        consecutive = False
-                    i -= 12
-        
-        # bottom-right corner
-        if state.matrix[143] == state.turn:
-            secured.add(143)
-            i = 142
-            consecutive = True
-            while i > 132 and consecutive:
-                j = i
-                line = set()
-                full_line = True
-                while j % 12 != 0 and full_line:
-                    if state.matrix[j] == state.turn:
-                        line.add(j)
-                    else:
-                        full_line = False
-                    j = j + 1 - 12
-                if full_line:
-                    secured |= line
-                else:
-                    consecutive = False
+                        consecutive_in_line = False
+                if not consecutive_in_line:
+                    line_max = j - 1
                 i -= 1
-            if consecutive:
-                i = 132
-                while i > 0 and consecutive:
-                    j = i
-                    line = set()
-                    full_line = True
-                    while j < 143 and full_line:
-                        if state.matrix[j] == state.turn:
-                            line.add(j)
-                        else:
-                            full_line = False
-                        j = j + 1 - 12
-                    if full_line:
-                        secured |= line
+         
+        # bottom-right
+        if state.matrix[11] == state.turn:
+            secured.add(11)
+            i = 11
+            line_max = 0
+            while i >= 0 and line_max < 11:
+                consecutive_in_line = True
+                j = 11
+                while j >= line_max + 1 and consecutive_in_line:
+                    if state.matrix[12 * i + j] == state.turn:
+                        secured.add(12 * i + j)
+                        j -= 1
                     else:
-                        consecutive = False
-                    i -= 12
-        
-        # top edge
-        i = 0
-        consecutive = True
-        while i <= 132 and consecutive:
-            line = set()
-            full_line = True
-            j = 0
-            while j <= 11 and full_line:
-                if state.matrix[i + j] == state.turn:
-                    line.add(i + j)
-                else:
-                    full_line = False
-                j += 1
-            if full_line:
-                secured |= line
-            else:
-                consecutive = False
-            i += 12
-        
-        # bottom edge
-        i = 132
-        consecutive = True
-        while i >= 0 and consecutive:
-            line = set()
-            full_line = True
-            j = 0
-            while j <= 11 and full_line:
-                if state.matrix[i + j] == state.turn:
-                    line.add(i + j)
-                else:
-                    full_line = False
-                j += 1
-            if full_line:
-                secured |= line
-            else:
-                consecutive = False
-            i -= 12
-        
-        # left edge
-        i = 0
-        consecutive = True
-        while i <= 11 and consecutive:
-            line = set()
-            full_line = True
-            j = 0
-            while j <= 132 and full_line:
-                if state.matrix[i + j] == state.turn:
-                    line.add(i + j)
-                else:
-                    full_line = False
-                j += 12
-            if full_line:
-                secured |= line
-            else:
-                consecutive = False
-            i += 1
-        
-        # right edge
-        i = 11
-        consecutive = True
-        while i >= 0 and consecutive:
-            line = set()
-            full_line = True
-            j = 0
-            while j <= 132 and full_line:
-                if state.matrix[i + j] == state.turn:
-                    line.add(i + j)
-                else:
-                    full_line = False
-                j += 12
-            if full_line:
-                secured |= line
-            else:
-                consecutive = False
-            i -= 1
-        
+                        consecutive_in_line = False
+                if not consecutive_in_line:
+                    line_max = j + 1
+                i -= 1
+
         return len(secured)
 
     def turn_loop(self, ui):
@@ -609,10 +455,19 @@ class Board:
         if len(neighbors) == 0:
             # no possible moves, skip turn
             ui.draw_board()
-            self.next_turn()
-            print('Skipping, call turn loop')
-            self.turn_loop(ui)
+            if not self.player_skipped:
+                self.next_turn()
+                self.player_skipped = True
+                print('Skipping, call turn loop')
+                self.turn_loop(ui)
+            else:
+                # both players have skipped - it's a draw
+                print('winner', Winner.draw)
+                ui.winner = Winner.draw
+                ui.draw_board()
             return
+        else:
+            self.player_skipped = False
 
         if players[self.state.turn.value - 1] == PlayerOptions.Player:
             # it's a player's turn, mark his possible moves and wait for his action
@@ -621,7 +476,7 @@ class Board:
             ui.wait_for_player = True
             
         elif players[self.state.turn.value - 1] == PlayerOptions.MinMax:
-            if self.state.turn == MatrixValues.player_2 and players[0] == players[1]:
+            if self.state.turn == MatrixValues.player_2: # and players[0] == players[1]:
                 # both players are AI, use 2nd heuristic funcion for the second player
                 heuristic_funcion = self.heuristic_funcion2
             else:
@@ -643,7 +498,7 @@ class Board:
             Board.clear_neighbors(self.state)
 
         elif players[self.state.turn.value - 1] == PlayerOptions.MinMaxAlphaBeta:
-            if self.state.turn == MatrixValues.player_2 and players[0] == players[1]:
+            if self.state.turn == MatrixValues.player_2: # and players[0] == players[1]:
                 # both players are AI, use 2nd heuristic funcion for the second player
                 heuristic_funcion = self.heuristic_funcion2
             else:

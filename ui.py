@@ -90,7 +90,7 @@ class UI:
             self.buttons[i].config(bg=colors[self.board.state.matrix[i]])
         if self.winner is not None:
            # print winner here...
-           self.label_winner = Label(self.frame, text=str(self.winner.name + ' WINS!')) 
+           self.label_winner = Label(self.frame, text=(self.winner.name + ' WINS!' if self.winner != Winner.draw else self.winner.name)) 
            self.label_winner.grid(column=3, row=3, columnspan=6, rowspan=6)	
         self.master.update_idletasks()
 	
