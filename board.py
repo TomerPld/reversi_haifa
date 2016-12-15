@@ -38,6 +38,7 @@ class Board:
         self.state = State().init_state()
         ui.wait_for_player = False
         ui.winner = None
+        ui.draw_board()
         self.turn_loop(ui)
 
     @staticmethod
@@ -159,7 +160,7 @@ class Board:
         for neighbor in neighbors:
             self.state.matrix[neighbor] = MatrixValues.neighbor
 			
-        print('neighbors', neighbors)
+        # print('neighbors', neighbors)
         boards = []
         
         for neighbor in neighbors:
@@ -381,7 +382,21 @@ class Board:
                 if not consecutive_in_line:
                     line_max = j - 1
                 i += 1
-         
+            i = 0
+            line_max = 12
+            while i <= 11 and line_max > 1:
+                consecutive_in_line = True
+                j = 0
+                while j <= line_max - 1 and consecutive_in_line:
+                    if state.matrix[i + 12 * j] == state.turn:
+                        secured.add(i + 12 * j)
+                        j += 1
+                    else:
+                        consecutive_in_line = False
+                if not consecutive_in_line:
+                    line_max = j - 1
+                i += 1
+        
         # top-right
         if state.matrix[11] == state.turn:
             secured.add(11)
@@ -393,6 +408,20 @@ class Board:
                 while j >= line_max + 1 and consecutive_in_line:
                     if state.matrix[12 * i + j] == state.turn:
                         secured.add(12 * i + j)
+                        j -= 1
+                    else:
+                        consecutive_in_line = False
+                if not consecutive_in_line:
+                    line_max = j + 1
+                i += 1
+            i = 0
+            line_max = 0
+            while i <= 11 and line_max < 11:
+                consecutive_in_line = True
+                j = 11
+                while j >= line_max + 1 and consecutive_in_line:
+                    if state.matrix[i + 12 * j] == state.turn:
+                        secured.add(i + 12 * j)
                         j -= 1
                     else:
                         consecutive_in_line = False
@@ -417,7 +446,21 @@ class Board:
                 if not consecutive_in_line:
                     line_max = j - 1
                 i -= 1
-         
+            i = 11
+            line_max = 12
+            while i >= 0 and line_max > 1:
+                consecutive_in_line = True
+                j = 0
+                while j <= line_max - 1 and consecutive_in_line:
+                    if state.matrix[i + 12 * j] == state.turn:
+                        secured.add(i + 12 * j)
+                        j += 1
+                    else:
+                        consecutive_in_line = False
+                if not consecutive_in_line:
+                    line_max = j - 1
+                i -= 1
+        
         # bottom-right
         if state.matrix[11] == state.turn:
             secured.add(11)
@@ -435,7 +478,21 @@ class Board:
                 if not consecutive_in_line:
                     line_max = j + 1
                 i -= 1
-
+            i = 11
+            line_max = 0
+            while i >= 0 and line_max < 11:
+                consecutive_in_line = True
+                j = 11
+                while j >= line_max + 1 and consecutive_in_line:
+                    if state.matrix[i + 12 * j] == state.turn:
+                        secured.add(i + 12 * j)
+                        j -= 1
+                    else:
+                        consecutive_in_line = False
+                if not consecutive_in_line:
+                    line_max = j + 1
+                i -= 1
+        
         return len(secured)
 
     def turn_loop(self, ui):

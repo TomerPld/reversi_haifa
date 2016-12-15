@@ -2,13 +2,21 @@ from board import *
 from enums import *
 
 def heuristic_funcion(board, depth):
-    win = float('inf')
-    loss = -float('inf')
+    win = 1000000000
+    loss = -win
     edge = 5
     corner = 25
     own_counter = 0
     opponent_counter = 0
     
+    winner = Board.get_winner(board.state)
+    if (winner == Winner.player_1 and board.state.turn == MatrixValues.player_1) or \
+       (winner == Winner.player_2 and board.state.turn == MatrixValues.player_2):
+        return win
+    elif (winner == Winner.player_1 and board.state.turn == MatrixValues.player_2) or \
+       (winner == Winner.player_2 and board.state.turn == MatrixValues.player_1):
+        return loss
+
     for i in range(144):
         value = 1
         if i in [0, 11, 132, 143]:
@@ -34,12 +42,21 @@ def heuristic_funcion(board, depth):
     return 2 * (own_counter - opponent_counter) + (own_possible - opponent_possible) + 10 * (own_secured - opponent_secured)
 	
 def heuristic_funcion2(board, depth):
-    win = float('inf')
-    loss = -float('inf')
+    win = 1000000000
+    loss = -win
     edge = 25
     corner = 125
     own_counter = 0
     opponent_counter = 0
+    
+    winner = Board.get_winner(board.state)
+    if (winner == Winner.player_1 and board.state.turn == MatrixValues.player_1) or \
+       (winner == Winner.player_2 and board.state.turn == MatrixValues.player_2):
+        return win
+    elif (winner == Winner.player_1 and board.state.turn == MatrixValues.player_2) or \
+       (winner == Winner.player_2 and board.state.turn == MatrixValues.player_1):
+        return loss
+
     
     for i in range(144):
         value = 1
@@ -82,7 +99,7 @@ def heuristic_funcion2(board, depth):
     return 2 * (own_counter - opponent_counter) + (own_possible - opponent_possible) + 100 * (own_secured - opponent_secured) + 10 * dominant_percentage + 10 * dominant_possible_percentage
 
 
-def heuristic_funcion3(board, depth):
+def heuristic_funcion_shahchaf(board, depth):
     p = 0
     c = 0
     l = 0

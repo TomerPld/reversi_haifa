@@ -18,8 +18,8 @@ class UI:
         self.buttons = []
         for i in range(12):
             for j in range(12):
-                # button = Button(self.frame, text="      ", command= lambda x=i, y=j: self.player_action(x,y))			
-                button = Button(self.frame, text='{:3d}'.format(i * 12 + j), command= lambda x=i, y=j: self.player_action(x,y))			
+                button = Button(self.frame, text="      ", command= lambda x=i, y=j: self.player_action(x,y))			
+                # button = Button(self.frame, text='{:3d}'.format(i * 12 + j), command= lambda x=i, y=j: self.player_action(x,y))			
                 button.grid(column=j, row=i)	
                 self.buttons.append(button)	
         
