@@ -2,7 +2,6 @@ from enums import *
 
 
 def min_max(board, depth, heuristic_funcion, max_depth):
-    static_value = heuristic_funcion(board, depth)
     successors = board.get_neighbors_states()
     stuck = False
     if len(successors) == 0:
@@ -12,6 +11,7 @@ def min_max(board, depth, heuristic_funcion, max_depth):
         if len(opponent_successors) == 0:
             stuck = True
     if stuck or depth >= max_depth:
+        static_value = heuristic_funcion(board, depth)
         return static_value, []
 		
     if len(successors) == 0:

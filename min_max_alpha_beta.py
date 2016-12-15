@@ -2,7 +2,6 @@ from enums import *
 
 
 def min_max_alpha_beta(board, depth, heuristic_funcion, max_depth, alpha, beta):
-    static_value = heuristic_funcion(board, depth)
     successors = board.get_neighbors_states()
     stuck = False
     if len(successors) == 0:
@@ -12,6 +11,7 @@ def min_max_alpha_beta(board, depth, heuristic_funcion, max_depth, alpha, beta):
         if len(opponent_successors) == 0:
             stuck = True
     if stuck or depth >= max_depth:
+        static_value = heuristic_funcion(board, depth)
         return static_value, []
 		
     if len(successors) == 0:
@@ -29,7 +29,7 @@ def min_max_alpha_beta(board, depth, heuristic_funcion, max_depth, alpha, beta):
                 best = value
                 best_path = path
                 best_path.append(m)
-            beta = min(beta, value)
+            alpha = max(alpha, value)
         if alpha > beta:
             print(' ' * depth, 'alpha > beta')
         return best, best_path
@@ -44,7 +44,7 @@ def min_max_alpha_beta(board, depth, heuristic_funcion, max_depth, alpha, beta):
                 best = value
                 best_path = path
                 best_path.append(m)
-            alpha = max(alpha, value)
+            beta = min(beta, value)
         if alpha > beta:
             print(' ' * depth, 'alpha > beta')
         return best, best_path
