@@ -9,8 +9,10 @@ class Winner(Enum):
 
 class PlayerOptions(Enum):
     Player = 0
-    MinMax = 1
-    MinMaxAlphaBeta = 2
+    FilePlayer = 1
+    MinMax = 2
+    MinMaxAlphaBeta = 3
+
 
     def get_next(current):
         return PlayerOptions((current.value + 1) % len(PlayerOptions.__members__.items()))

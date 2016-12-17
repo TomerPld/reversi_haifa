@@ -1,5 +1,6 @@
 import time
-
+import os
+import re
 from enums import *
 from min_max import min_max
 from min_max_alpha_beta import min_max_alpha_beta
@@ -27,15 +28,18 @@ class State:
         return MatrixValues.player_1 if self.turn == MatrixValues.player_2 else MatrixValues.player_2
 
 class Board:
-    def __init__(self, heuristic_funcion=None, heuristic_funcion2=None):
+    def __init__(self, heuristic_funcion=None, heuristic_funcion2=None, com_file="com_file.txt"):
         self.state = State().init_state()
         self.heuristic_funcion = heuristic_funcion
         self.heuristic_funcion2 = heuristic_funcion2
         self.max_depth = 3
         self.player_skipped = False
+        self.last_file_change = time.time()
+        self.com_file = com_file
         
     def reset(self, ui):
         self.state = State().init_state()
+        self.last_file_change = time.time()
         ui.wait_for_player = False
         ui.winner = None
         ui.draw_board()
@@ -531,14 +535,23 @@ class Board:
             for neighbor in neighbors:
                 self.state.matrix[neighbor] = MatrixValues.neighbor
             ui.wait_for_player = True
-            
+        
+        elif players[self.state.turn.value -1] == PlayerOptions.FilePlayer:
+		    # Wait till com file is updated, read and apply move.
+			# Verify that move is legal.
+			# Apply the move.
+            print("waiting for file player")
+            self._move_from_file(ui)
+            self.next_turn()
+            Board.clear_neighbors(self.state)
+
         elif players[self.state.turn.value - 1] == PlayerOptions.MinMax:
             if self.state.turn == MatrixValues.player_2: # and players[0] == players[1]:
                 # both players are AI, use 2nd heuristic funcion for the second player
                 heuristic_funcion = self.heuristic_funcion2
             else:
                 heuristic_funcion = self.heuristic_funcion
-            
+				
             # call minmax
             print('call minmax')
             current_turn =  self.state.turn
@@ -548,6 +561,7 @@ class Board:
                 # extract the next state to use
                 self.state = best_path[-1].state
                 self.state.turn = current_turn
+                self._move_to_file(ui)
             print('best', best)
             print('best_path', [b.state.last_index for b in best_path])
             
@@ -564,12 +578,13 @@ class Board:
             # call MinMaxAlphaBeta
             print('call MinMaxAlphaBeta')
             current_turn =  self.state.turn
-            best, best_path = min_max_alpha_beta(self, 1, heuristic_funcion, self.max_depth + 1, -float('inf'), float('inf'))
+            best, best_path =   min_max_alpha_beta(self, 1, heuristic_funcion, self.max_depth + 1, -float('inf'), float('inf'))
             print('returned from MinMaxAlphaBeta')
             if len(best_path) > 0:
                 # extract the next state to use
                 self.state = best_path[-1].state
                 self.state.turn = current_turn
+                self._move_to_file()
             print('best', best)
             print('best_path', [b.state.last_index for b in best_path])
             
@@ -581,6 +596,45 @@ class Board:
         if not ui.wait_for_player:
             print('call turn loop')
             self.turn_loop(ui)
+
+    def _move_to_file(self):
+        # If file player is playing, write player's move to file.
+        # If player_1 ->  write B, otherwise write W
+        letter = "B" if self.state.turn == MatrixValues.player_1 else "W"
+        coord = self.state.last_index
+        coordX = coord % 12
+        coordY =  int((coord - coordX) / 12)
+        coordX = chr(ord('A') + coordX)
+        move_string = "({0},{1}{2})".format(letter, coordX,coordY)
+        with open(self.com_file, "w") as com_file:
+            print(move_string, file=com_file)
+        self.last_file_change = os.stat(self.com_file).st_mtime
+        print('move to file')
+
+    def _move_from_file(self, ui):
+        # Each player is waiting for his own color.
+        letter = "B" if self.state.turn == MatrixValues.player_1 else "W"
+        neighbors = Board.get_neighbors(self.state)
+        while (True):
+            if os.stat(self.com_file).st_mtime > self.last_file_change:
+                with open(self.com_file, "r") as com_file:
+                    file_content = tuple(com_file)
+                    print(file_content)
+                    if (len(file_content) > 1):
+                        print('ERROR. illegal move of file player - file format')
+                        break
+                    input_str = file_content[0]
+                    if letter == input_str.strip('()').split(',')[0]:
+                        move_str = input_str.strip('() \n').split(',')[1]
+                        coordX = ord(move_str[0]) - ord('A')
+                        coordY = int(move_str[1:])
+                        move = coordX + coordY * 12
+                        if move in neighbors:
+                            self.player_action(move, ui)
+                        else:
+                            print('ERROR. illegal move of file player - wrong tile')
+                        break
+            time.sleep(1)
 
     def next_turn(self):
         self.state.turn = self.state.get_opponent()
