@@ -542,8 +542,6 @@ class Board:
 			# Apply the move.
             print("waiting for file player")
             self._move_from_file(ui)
-            self.next_turn()
-            Board.clear_neighbors(self.state)
 
         elif players[self.state.turn.value - 1] == PlayerOptions.MinMax:
             if self.state.turn == MatrixValues.player_2: # and players[0] == players[1]:
@@ -561,7 +559,7 @@ class Board:
                 # extract the next state to use
                 self.state = best_path[-1].state
                 self.state.turn = current_turn
-                self._move_to_file(ui)
+                self._move_to_file()
             print('best', best)
             print('best_path', [b.state.last_index for b in best_path])
             
@@ -617,24 +615,22 @@ class Board:
         neighbors = Board.get_neighbors(self.state)
         while (True):
             if os.stat(self.com_file).st_mtime > self.last_file_change:
+                self.last_file_change = os.stat(self.com_file).st_mtime
                 with open(self.com_file, "r") as com_file:
-                    file_content = tuple(com_file)
-                    print(file_content)
-                    if (len(file_content) > 1):
-                        print('ERROR. illegal move of file player - file format')
-                        break
-                    input_str = file_content[0]
+                    input_str = com_file.readline()
                     if letter == input_str.strip('()').split(',')[0]:
                         move_str = input_str.strip('() \n').split(',')[1]
                         coordX = ord(move_str[0]) - ord('A')
                         coordY = int(move_str[1:])
                         move = coordX + coordY * 12
+                        print(move)
                         if move in neighbors:
                             self.player_action(move, ui)
                         else:
+                            self.next_turn()
+                            Board.clear_neighbors(self.state)
                             print('ERROR. illegal move of file player - wrong tile')
                         break
-            time.sleep(1)
 
     def next_turn(self):
         self.state.turn = self.state.get_opponent()
