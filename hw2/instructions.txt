@@ -1,0 +1,21 @@
+strips application:
+move furnitures inside the house (2d)
+18.1 (Wed) due date
+2-3 students
+SHOULD be uploaded to the website
+input: house, rooms, doors, furniture description
+all furnitures, and rooms are rectangles. doors are an interval of the wall. wall width is 0.
+
+can be implemented to the given map / any map.
+
+actions:
+move furniture up, down, lfr, right.
+rotate 90 degrees right, left (from either any corner, and the center. make sure the surrounding area is clear enough).
+
+define pre-conditions and post-conditions to each action.
+
+the applications should request a starting state, and an ending state.
+add a window to "view the stack", and a switch to move to the next step.
+you can use macros (add the number of times to repeat each action).
+
+the output is the instructions list.
