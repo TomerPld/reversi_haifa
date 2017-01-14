@@ -111,7 +111,7 @@ public class GUI extends JPanel implements MouseListener, MouseMotionListener, A
 		// btnRotateCW - Rotate clockwise furniture button
 		arrow_cw = new ImageIcon("images/CW.png");
 		btnRotateCW = new JButton();
-		btnRotateCW.setBounds(1405, 55, 40, 40);
+		btnRotateCW.setBounds(1105, 205, 40, 40);
 		btnRotateCW.setIcon(arrow_cw);
 		btnRotateCW.setOpaque(false);
 		btnRotateCW.setContentAreaFilled(false);
@@ -122,7 +122,7 @@ public class GUI extends JPanel implements MouseListener, MouseMotionListener, A
 		// btnRotateCCW - Rotate counter-clockwise furniture button
 		arrow_ccw = new ImageIcon("images/CCW.png");
 		btnRotateCCW = new JButton();
-		btnRotateCCW.setBounds(1305, 55, 40, 40);
+		btnRotateCCW.setBounds(1005, 205, 40, 40);
 		btnRotateCCW.setIcon(arrow_ccw);
 		btnRotateCCW.setOpaque(false);
 		btnRotateCCW.setContentAreaFilled(false);
@@ -132,31 +132,31 @@ public class GUI extends JPanel implements MouseListener, MouseMotionListener, A
 		
 		// btnMoveRight - Move right furniture button
 		btnMoveRight = new JButton("<html><center> &gt; </center></html>");
-		btnMoveRight.setBounds(1405, 105, 40, 40);
+		btnMoveRight.setBounds(1105, 255, 40, 40);
 		btnMoveRight.addActionListener(this);
 		btnMoveRight.setFocusable(false);
 
 		// btnMoveDown - Move down furniture button
 		btnMoveDown = new JButton("<html><center> \\/ </center></html>");
-		btnMoveDown.setBounds(1355, 105, 40, 40);
+		btnMoveDown.setBounds(1055, 255, 40, 40);
 		btnMoveDown.addActionListener(this);
 		btnMoveDown.setFocusable(false);
 
 		// btnMoveLeft - Move left furniture button
 		btnMoveLeft = new JButton("<html><center> &lt; </center></html>");
-		btnMoveLeft.setBounds(1305, 105, 40, 40);
+		btnMoveLeft.setBounds(1005, 255, 40, 40);
 		btnMoveLeft.addActionListener(this);
 		btnMoveLeft.setFocusable(false);
 
 		// btnMoveUp - Move right furniture button
 		btnMoveUp = new JButton("<html><center> /\\ </center></html>");
-		btnMoveUp.setBounds(1355, 55, 40, 40);
+		btnMoveUp.setBounds(1055, 205, 40, 40);
 		btnMoveUp.addActionListener(this);
 		btnMoveUp.setFocusable(false);
 		
 		// btnSwitchDisp - Switch board/goal_board display button
 		btnSwitchDisp = new JButton("<html><center>Switch Display</center></html>");
-		btnSwitchDisp.setBounds(1305, 155, 140, 40);
+		btnSwitchDisp.setBounds(1005, 305, 140, 40);
 		btnSwitchDisp.addActionListener(this);
 		btnSwitchDisp.setFocusable(false);
 	
@@ -168,7 +168,7 @@ public class GUI extends JPanel implements MouseListener, MouseMotionListener, A
 
 		// btnNextStep - Perform the next step in the algorithm
 		btnNextStep = new JButton("<html><center>Next Step</center></html>");
-		btnNextStep.setBounds(1005, 155, 90, 40);
+		btnNextStep.setBounds(1005, 105, 90, 40);
 		btnNextStep.addActionListener(this);
 		btnNextStep.setFocusable(false);
 		
@@ -192,11 +192,11 @@ public class GUI extends JPanel implements MouseListener, MouseMotionListener, A
 //		radioAvoid.setContentAreaFilled(false);
 //		perform_group.add(radioAvoid);
 		
-		// btnExecute - Executes all actions in lsitAction
-		btnExecute = new JButton("<html><center>Execute Actions</center></html>");
-		btnExecute.setBounds(1105, 155, 90, 40);
-		btnExecute.addActionListener(this);
-		btnExecute.setFocusable(false);
+//		// btnExecute - Executes all actions in lsitAction
+//		btnExecute = new JButton("<html><center>Execute Actions</center></html>");
+//		btnExecute.setBounds(1105, 155, 90, 40);
+//		btnExecute.addActionListener(this);
+//		btnExecute.setFocusable(false);
 		
 		this.add(title);
 		this.add(btnCreate);
@@ -212,7 +212,7 @@ public class GUI extends JPanel implements MouseListener, MouseMotionListener, A
 		this.add(btnNextStep);
 		//this.add(radioPerform);
 		//this.add(radioAvoid);
-		this.add(btnExecute);
+		//this.add(btnExecute);
 	}
 		
 	
@@ -334,12 +334,12 @@ public class GUI extends JPanel implements MouseListener, MouseMotionListener, A
 
 		/** display menu **/
 		g.setColor(Color.darkGray);
-		g.fillRect(1000, 0, 550, 250);
+		g.fillRect(1001, 0, 205, 12*50);
 		
 		// subtitle - indicates whether normal or goal board are currently shown
 		g.setColor(Color.black);
 		g.setFont(subtitle);
-		g.drawString(game.goal ? "goal board" : "initial board", 1415, 45);
+		g.drawString(game.goal ? "goal board" : "initial board", 1015, 195);
 		
 //		this.paintComponents(g);
 	}
@@ -588,24 +588,18 @@ public class GUI extends JPanel implements MouseListener, MouseMotionListener, A
 		} else if(e.getSource() == btnMoveUp){
 			doMove(tmp_id, Move.UP);
 		} else if(e.getSource() == btnSwitchDisp){
-			game.goal = game.goal ^ true;
+			game.goal = !game.goal;
 			if(game.goal){
 				btnCreate.setVisible(false);
 				btnDelete.setVisible(false);
 				btnFindSolution.setVisible(false);
 				btnNextStep.setVisible(false);
-				radioPerform.setVisible(false);
-				radioAvoid.setVisible(false);
-				btnExecute.setVisible(false);		
 			} else {
 				btnCreate.setVisible(true);
 				btnDelete.setVisible(true);		
 				btnFindSolution.setVisible(true);
 				btnNextStep.setVisible(true);
-				radioPerform.setVisible(true);
-				radioAvoid.setVisible(true);
-				btnExecute.setVisible(true);				
-			}	
+			}
 		} else if(e.getSource() == btnFindSolution){
 			executeSTRIPS();
 		} else if(e.getSource() == btnNextStep){

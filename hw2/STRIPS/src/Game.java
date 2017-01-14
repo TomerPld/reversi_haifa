@@ -50,12 +50,11 @@ public class Game
 //        goal_state.pList.add(new PPosition(1,false,1,2,3,4,Move.DOWN));
         
         for(int i = 1; i < 12; i++)
-        	for(int j = 1; j < 24; j++)
-        		if(!((i==12) || (i>5 && j>11) || (j==12 && i==1) || (j==12 && i==5)))
-        		{
-        			initial_state.addPredicate(new PEmpty(i,j));
-        			goal_state.addPredicate(new PEmpty(i,j));
-        		}
+        	for(int j = 1; j < 20; j++)
+        	{
+				initial_state.addPredicate(new PEmpty(i,j));
+				goal_state.addPredicate(new PEmpty(i,j));
+			}
         
 //        addFurniture(3, 2, 1, 1);
 //        addFurniture(2, 5, 1, 1);
@@ -101,7 +100,7 @@ public class Game
         
         // board frame window
         brd_frame.add(gui);
-        brd_frame.setMinimumSize(new Dimension(1550, 680));
+        brd_frame.setMinimumSize(new Dimension(1205, 630));
         brd_frame.setResizable(false);
         brd_frame.pack();
         brd_frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
