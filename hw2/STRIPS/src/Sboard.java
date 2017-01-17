@@ -1,17 +1,12 @@
-
-
 import java.util.*;
-import javax.swing.text.html.HTMLDocument.Iterator;
 
 enum Move {UP,RIGHT,DOWN,LEFT};
 
 public class Sboard {
 	
 	private int [][]a = new int [13][25];
-//	public Vector<Furniture> vectorFurniture = new Vector<Furniture>();
 	public LinkedList<Integer> listId = new LinkedList<Integer>();
 	public Hashtable<Integer, Furniture> tblFurniture = new Hashtable<Integer, Furniture>();
-//	public int last_id = 1;
 	
 	// Constructor - initializes rooms
 	public Sboard()
@@ -60,21 +55,11 @@ public class Sboard {
 		else
 			listId.add(listId.getLast() + 1);
 			
-		/** TODO */
-//		if(vectorFurniture.isEmpty())
-//			listId.add(1);
-//		else
-//			listId.add(listId.getLast()+1);
-		
-		
-//		last_id = vectorFurniture.isEmpty()? 1 : vectorFurniture.lastIndexOf(vectorFurniture.lastElement()) + 2;
 		if(!canPlace(x,y,width,length,0))
 			return -1;
 		
-//		furn = new Furniture(x,y,width,length,last_id,Move.UP);
 		furn = new Furniture(x,y,width,length,listId.getLast(),Move.UP);
 		tblFurniture.put(furn.id, furn);
-//		vectorFurniture.add(furn);
 		addFurnitureToArray(furn);
 		return furn.id;
 	}
@@ -181,14 +166,9 @@ public class Sboard {
 		if(furn == null)
 			return;
 		deleteFurnitureFromArray(furn);
-//		System.out.println("furn.id to delete: " + furn.id);
-//		System.out.println("(pre-removal) last_id = " + getLastId());
 		listId.remove((Integer)furn.id);
-//		System.out.println("(post-removal) last_id = " + getLastId());
 		tblFurniture.remove(furn.id);
 		
-		//TODO
-//		vectorFurniture.remove(furn);
 	}
 	
 	// Returns whether the given furniture can be rotated in the given direction (cw/ccw)
@@ -213,57 +193,44 @@ public class Sboard {
 		min_width	= Math.min(furn.width  , tmp.width);
 		max_width	= Math.max(furn.width  , tmp.width);
 		
-//		cond = (furn.cornerx > tmp.cornerx) || (furn.cornery > tmp.cornery);
 		cond = (furn.length > furn.width);
 		
 		if((clockwise && cond) || (!clockwise && !cond))	// upper right and lower left
 		{
-//			System.out.println("upper right");
 			for(int i = min_y; i < max_y + min_length; i++)
 			{
 				for(int j = max_x + (i < max_y ? 0 : min_width); j < min_x + max_width; j++)
 				{
-//					System.out.print("a[" + i + "][" + j + "]=" + a[i][j] + ", ");
 					if((a[i][j] != 0) && (a[i][j] != furn.id))
 						return false;
 				}
-//				System.out.println();
 			}
-//			System.out.println("lower left");
 			for(int i = max_y; i < min_y + max_length; i++)
 			{
 				for(int j = min_x; j < max_x + (i < (max_y + min_length) ? 0 : min_width); j++)
 				{
-//					System.out.print("a[" + i + "][" + j + "]=" + a[i][j] + ", ");
 					if((a[i][j] != 0) && (a[i][j] != furn.id))
 						return false;
 				}
-//				System.out.println();
 			}
 		}
 		else												// upper left and lower right
 		{
-//			System.out.println("upper left");
 			for(int i = min_y; i < max_y + min_length; i++)
 			{
 				for(int j = min_x; j < max_x + (i < max_y ? min_width : 0); j++)
 				{
-//					System.out.print("a[" + i + "][" + j + "]=" + a[i][j] + ", ");
 					if((a[i][j] != 0) && (a[i][j] != furn.id))
 						return false;
 				}
-//				System.out.println();
 			}
-//			System.out.println("lower right");
 			for(int i = max_y; i < min_y + max_length; i++)
 			{
 				for(int j = max_x + (i < (max_y + min_length) ? min_width : 0); j < min_x + max_width; j++)
 				{
-//					System.out.print("a[" + i + "][" + j + "]=" + a[i][j] + ", ");
 					if((a[i][j] != 0) && (a[i][j] != furn.id))
 						return false;
 				}
-//				System.out.println();
 			}
 		}
 		return true;
@@ -291,9 +258,6 @@ public class Sboard {
 		return a[i][j];
 	}
 
-//	public Furniture getFurnitureAt(int index) {
-//		return vectorFurniture.get(index);
-//	}
 	
 	// Updates given furniture on array (adds frame and furn on top)
 	public void updateFurnitureOnArray(Furniture furn, Furniture frame)
@@ -311,45 +275,16 @@ public class Sboard {
 		furn.length = length;
 		updateFurnitureOnArray(furn, frame);
 	}
-
-//	public int getVectorSize() {
-//		return vectorFurniture.size();
-//	}
 	
 	public int getLastId(){
 		return tblFurniture.isEmpty()? -1: listId.getLast();
-		//TODO
-//		return vectorFurniture.isEmpty()? -1: listId.getLast();
 	}
-	
-//	public int getLastVectorIndex() {
-//		return vectorFurniture.lastIndexOf(vectorFurniture.lastElement());
-//	}
-	
+		
 	public Furniture getFurnitureById(int id)
 	{
 		return tblFurniture.get(id);
-		//TODO
-//		for(Furniture f : vectorFurniture)
-//			if(f.id == id)
-//				return f;
-//		return null;
 	}
-	
-//	public boolean equals(Sboard brd)
-//	{
-//		int id;
-//		if(tblFurniture.size() != brd.tblFurniture.size())
-//			return false;
-//		for(int i=0; i<listId.size(); i++)
-//		{
-//			id = listId.get(i);
-//			if(!tblFurniture.get(id).equals(brd.tblFurniture.get(id)))
-//				return false;
-//		}
-//		return true;
-//	}
-	
+		
 	public int getListSize(){
 		return listId.size();
 	}

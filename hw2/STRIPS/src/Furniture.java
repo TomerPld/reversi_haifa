@@ -38,9 +38,6 @@ public class Furniture {
 		x = cornerx + (width/2.0) - (length/2.0);
 		y = cornery + (length/2.0) - (width/2.0);
 		
-//		System.out.println("cornerx = " + cornerx + ", cornery = " + cornery + ", width = " + width + ", length = " + length);
-//		System.out.println("(B-rotate) X= " + x + " Y= " + y);
-		
 		if((width + length)%2 == 1)
 		{
 			switch (state) {
@@ -55,9 +52,6 @@ public class Furniture {
 					x -= 0.5;
 					y -= 0.5;
 				}
-//				x -= factor;
-//				y += factor;
-//				state = clockwise ? Move.LEFT : Move.RIGHT;
 				break;
 			case DOWN:
 				if(clockwise)
@@ -70,9 +64,6 @@ public class Furniture {
 					x += 0.5;
 					y -= 0.5;
 				}
-//				x -= factor;
-//				y -= factor;
-//				state = clockwise ? Move.LEFT : Move.RIGHT;
 				break;
 			case LEFT:
 				if(clockwise)
@@ -85,9 +76,6 @@ public class Furniture {
 					x += 0.5;
 					y += 0.5;
 				}
-//				x += factor;
-//				y -= factor;
-//				state = clockwise ? Move.UP : Move.DOWN;
 				break;
 			case UP:
 				if(clockwise)
@@ -100,9 +88,6 @@ public class Furniture {
 					x -= 0.5;
 					y += 0.5;
 				}
-//				x += factor;
-//				y += factor;
-//				state = clockwise ? Move.RIGHT : Move.LEFT;
 				break;
 			}
 		}
@@ -121,9 +106,7 @@ public class Furniture {
 			state = clockwise ? Move.RIGHT : Move.LEFT;
 			break;
 		}
-		
-//		System.out.println("(A-rotate) X= " + x + " Y= " + y);
-		
+
 		cornerx = (int) x;
 		cornery = (int) y;
 		

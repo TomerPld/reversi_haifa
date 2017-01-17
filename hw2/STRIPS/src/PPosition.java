@@ -32,9 +32,4 @@ public class PPosition extends Predicate {
 	{
 		return "Position(" + furn_id + ": " + x + ", " + y + ", " + width + ", " + length + ", " + state + ")";
 	}
-	
-//	public void printf()
-//	{
-//		System.out.println("id" + super.furn_id + "sign: " + super.sign + "x: " + x);
-//	}
 }

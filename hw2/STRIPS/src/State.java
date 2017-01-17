@@ -26,7 +26,6 @@ public class State {
 	public void removePredicate(Predicate p)
 	{
 		for(int i = 0; i < pList.size(); i++)
-//			System.out.println("pList.get("+i+").getClass = " + pList.get(i).getClass());
 			if(pList.get(i).getClass() == p.getClass())
 				if(p.getClass() == PPosition.class) {
 					PPosition tmp = (PPosition) pList.get(i);
@@ -104,13 +103,4 @@ public class State {
 			str = str + pList.get(i).toString();
 		return str;
 	}
-	
-//	public PPosition getPositionById(int furn_id)
-//	{
-//		Predicate pr;
-//		for(int i = 0; i < pList.size(); i++)
-//			if(((pr = pList.get(i)).getClass() == PPosition.class) && (((PPosition)pr).furn_id == furn_id))
-//				return (PPosition)pr;
-//		return null;
-//	}
 }

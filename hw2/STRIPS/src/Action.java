@@ -1,7 +1,6 @@
 
 public abstract class Action {
 	public Furniture furn;
-//	public int preference;
 	private State preconditions;
 	private State deleteList;
 	private State addList;

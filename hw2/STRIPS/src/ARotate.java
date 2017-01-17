@@ -149,22 +149,4 @@ public class ARotate extends Action {
 		return false;
 	}
 
-//	@Override
-//	public int compareTo(Action a) {
-//		if(super.preference < a.preference)
-//			return -1;
-//		else if(super.preference > a.preference)
-//			return 1;
-//		return 0;
-//	}
-//
-//	public void setPreference(int pref)
-//	{
-//		super.preference = pref;
-//	}
-//	
-//	public int getPreference()
-//	{
-//		return super.preference;
-//	}
 }

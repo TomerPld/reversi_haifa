@@ -3,20 +3,9 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Array;
-import java.util.Random;
-import java.util.Stack;
-import java.util.Vector;
-
-import javax.imageio.ImageIO;
 import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -26,6 +15,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextArea;
 
 
+@SuppressWarnings("serial")
 public class GUI extends JPanel implements MouseListener, MouseMotionListener, ActionListener
 {	
 	Game game;
@@ -171,33 +161,7 @@ public class GUI extends JPanel implements MouseListener, MouseMotionListener, A
 		btnNextStep.setBounds(1005, 105, 90, 40);
 		btnNextStep.addActionListener(this);
 		btnNextStep.setFocusable(false);
-		
-//		// radioPerform - Perform actions during steps select button
-//		radioPerform = new JRadioButton("Perform");
-//		radioPerform.setBounds(1255, 205, 80, 20);
-//		radioPerform.setForeground(Color.white);
-//		radioPerform.setSelected(true);
-//		radioPerform.addActionListener(this);
-//		radioPerform.setFocusable(false);
-//		radioPerform.setContentAreaFilled(false);
-//		perform_group.add(radioPerform);
-//
-//		// radioAvoid - Avoid performing actions during steps select button
-//		radioAvoid = new JRadioButton("Avoid");
-//		radioAvoid.setBounds(1255, 225, 80, 20);
-//		radioAvoid.setForeground(Color.white);
-//		radioAvoid.setSelected(false);
-//		radioAvoid.addActionListener(this);
-//		radioAvoid.setFocusable(false);
-//		radioAvoid.setContentAreaFilled(false);
-//		perform_group.add(radioAvoid);
-		
-//		// btnExecute - Executes all actions in lsitAction
-//		btnExecute = new JButton("<html><center>Execute Actions</center></html>");
-//		btnExecute.setBounds(1105, 155, 90, 40);
-//		btnExecute.addActionListener(this);
-//		btnExecute.setFocusable(false);
-		
+
 		this.add(title);
 		this.add(btnCreate);
 		this.add(btnDelete);
@@ -210,9 +174,6 @@ public class GUI extends JPanel implements MouseListener, MouseMotionListener, A
 		this.add(btnSwitchDisp);
 		this.add(btnFindSolution);
 		this.add(btnNextStep);
-		//this.add(radioPerform);
-		//this.add(radioAvoid);
-		//this.add(btnExecute);
 	}
 		
 	
@@ -224,7 +185,6 @@ public class GUI extends JPanel implements MouseListener, MouseMotionListener, A
 		
 		// paint current board's furniture (initial's/goal's) 
 		for(int i = 0; i<getListSize(); i++)
-//		for(int i = 0; i<getVectorSize(); i++)
 		{
 			furn = getFurnitureById(getListElement(i));
 			if(furn != null)
@@ -239,8 +199,6 @@ public class GUI extends JPanel implements MouseListener, MouseMotionListener, A
 				g.setColor(Color.black);
 				g.setFont(id_font);
 				g.drawString(Integer.toString(furn.id), furn.cornerx * 50 + furn.width * 25 - 5 * (int)(Math.log10(furn.id) + 1), furn.cornery * 50 + furn.length * 25 + 7);
-//				furn.text.setBounds(furn.cornerx * 50 + furn.width * 25 - 5 * (int)(Math.log10(furn.id) + 1), furn.cornery * 50 + furn.length * 25 - 10, 30, 20);
-								
 				g.setColor(Color.black);			
 				g.drawRect(furn.cornerx*50, furn.cornery*50, furn.width*50, furn.length*50);
 			}
@@ -273,25 +231,6 @@ public class GUI extends JPanel implements MouseListener, MouseMotionListener, A
 		game.goal = game.goal ^ true;
 		
 		this.paintComponents(g);
-		
-		// paint temporary furniture (during creation)
-//		g.setColor(Color.red);
-//		g.fillRect(tmp_furn.cornerx*50, tmp_furn.cornery*50, tmp_furn.width*50, tmp_furn.length*50);
-//		g.setColor(Color.black);			
-//		g.drawRect(tmp_furn.cornerx*50, tmp_furn.cornery*50, tmp_furn.width*50, tmp_furn.length*50);
-		
-		/** print board as text TODO **/
-//		for(int i=0; i<13; i++)
-//		{
-//			for(int j=0; j<24; j++)
-//			{
-//				if(getContent(i, j)>=0)
-//					System.out.print(" ");
-//				System.out.print(getContent(i, j) + ", ");
-//			}
-//			System.out.println(getContent(i, 24));
-//		}
-//		System.out.println();
 	}
 	
 
@@ -308,17 +247,6 @@ public class GUI extends JPanel implements MouseListener, MouseMotionListener, A
 				g.drawRect(j*50, i*50, 50, 50);
 			}
 				
-		// display tiles
-//		for(int j = 0; j<20; j++)
-//			for(int i = 0; i<13; i++)
-//				if(getContent(i,j)==-1)	// Walls
-//				{
-//					g.setColor(Color.gray);
-//					g.fillRect(j*50, i*50, 50, 50);
-//					g.setColor(Color.black);
-//					g.drawRect(j*50, i*50, 50, 50);
-//				}
-
 		//display walls
 		g.setColor(Color.black);
 		g.drawLine(0, 0, 0*50, 12*50);
@@ -341,7 +269,6 @@ public class GUI extends JPanel implements MouseListener, MouseMotionListener, A
 		g.setFont(subtitle);
 		g.drawString(game.goal ? "goal board" : "initial board", 1015, 195);
 		
-//		this.paintComponents(g);
 	}
 	
 	private int getContent(int i, int j) {
@@ -351,23 +278,10 @@ public class GUI extends JPanel implements MouseListener, MouseMotionListener, A
 	private int addFurniture(int x, int y, int width, int length) {
 		return game.addFurniture(x, y, width, length);
 	}
-	
-//	private Furniture getFurnitureAt(int index) {
-//		return game.getFurnitureAt(index);
-//	}
-	
+
 	private void deleteFurniture(int id) {
 		game.deleteFurniture(id);
 	}
-	
-//	public int getVectorSize()
-//	{
-//		return game.getVectorSize();
-//	}
-	
-//	public int getLastId(){
-//		return game.getLastId();
-//	}
 	
 	public int getListSize(){
 		return game.getListSize();
@@ -376,11 +290,7 @@ public class GUI extends JPanel implements MouseListener, MouseMotionListener, A
 	public int getListElement(int index){
 		return game.getListElement(index);
 	}
-	
-//	public int getLastVectorIndex() {
-//		return game.getLastVectorIndex();
-//	}
-	
+		
 	public void updateFurniture(int id, int x, int y, int width, int length, Furniture frame, boolean both)
 	{
 		game.updateFurniture(id, x, y, width, length, frame, both);
@@ -389,11 +299,7 @@ public class GUI extends JPanel implements MouseListener, MouseMotionListener, A
 	public boolean canPlace(int x, int y, int width, int length, int excp_id) {
 		return game.canPlace(x, y, width, length, excp_id);
 	}
-	
-//	public boolean canMove(Furniture furn, Move direction) {
-//		return game.canMove(furn, direction);
-//	}
-	
+		
 	public boolean doMove(int furn_id, Move direction) {
 		return game.doMove(furn_id, direction);
 	}
@@ -425,7 +331,6 @@ public class GUI extends JPanel implements MouseListener, MouseMotionListener, A
 	public void mousePressed(MouseEvent e) {
 		if(e.getButton() == MouseEvent.BUTTON3)	// MOUSE3: "Right-click" was made
 		{
-//			System.out.println("MOUSE3");
 			tmp_id = -1;
 			fur_create = false;
 		}
@@ -449,12 +354,7 @@ public class GUI extends JPanel implements MouseListener, MouseMotionListener, A
 				Furniture furn = getFurnitureById(tmp_id);
 				offset_x = prs_x - furn.cornerx;
 				offset_y = prs_y - furn.cornery;
-//				System.out.println("offset_x = " + offset_x + ", offset_y = " + offset_y);
 			}
-		
-//		System.out.println("tmp_id = " + tmp_id);
-//		if(fur_create)	// creating a new furniture at pressed location
-//			tmp_id = addFurniture(prs_x, prs_y, 1, 1);
 		paint(getGraphics());
 	}
 
@@ -494,44 +394,10 @@ public class GUI extends JPanel implements MouseListener, MouseMotionListener, A
 			
 			int lst_diff_x = Math.abs(lst_clk_x - prs_x);
 			int lst_diff_y = Math.abs(lst_clk_y - prs_y);
-			
-			//			if((lst_diff_x > prv_diff_x) || (lst_diff_y > prv_diff_y))	// last click has affected a larger area
-//			{
-//				// validating selection
-//				if(!canPlace(Math.min(lst_clk_x, prs_x), Math.min(lst_clk_y, prs_y), lst_diff_x + 1, lst_diff_y + 1, furn.id))
-//				{
-//					System.out.println("Can't place id " + furn.id + " at:");
-//					System.out.println("X=" + Math.min(lst_clk_x, prs_x) + ", Y=" + Math.min(lst_clk_y, prs_y) + ", Width=" + (lst_diff_x + 1) + ", Length=" + (lst_diff_y + 1));
-//					return;
-//				}
-//				
-//				// if valid, update furniture
-//				furn.cornerx = Math.min(lst_clk_x, prs_x);
-//				furn.cornery = Math.min(lst_clk_y, prs_y);
-//				furn.width = lst_diff_x + 1;
-//				furn.length = lst_diff_y + 1;
-//			}
-//			else														// previous click has affected a larger area
-//			{
-//				// validating selection
-//				if(!canPlace(Math.min(prv_clk_x, prs_x), Math.min(prv_clk_y, prs_y), prv_diff_x + 1, prv_diff_y + 1, furn.id))
-//				{
-//					System.out.println("Can't place id " + furn.id + " at:");
-//					System.out.println("X=" + Math.min(lst_clk_x, prs_x) + ", Y=" + Math.min(lst_clk_y, prs_y) + ", Width=" + (lst_diff_x + 1) + ", Length=" + (lst_diff_y + 1));
-//					return;
-//				}
-//				
-//				furn.cornerx = Math.min(lst_clk_x, prs_x);
-//				furn.cornery = Math.min(lst_clk_y, prs_y);
-//				furn.width = lst_diff_x + 1;
-//				furn.length = lst_diff_y + 1;
-//			}
-			
+
 			// validating selection
 			if(!canPlace(Math.min(lst_clk_x, prs_x), Math.min(lst_clk_y, prs_y), lst_diff_x + 1, lst_diff_y + 1, tmp_id))
 			{
-//				System.out.println("Can't place id " + tmp_id + " at:");
-//				System.out.println("X=" + Math.min(lst_clk_x, prs_x) + ", Y=" + Math.min(lst_clk_y, prs_y) + ", Width=" + (lst_diff_x + 1) + ", Length=" + (lst_diff_y + 1));
 				lst_clk_x = prv_clk_x;
 				lst_clk_y = prv_clk_y;
 				return;
@@ -548,7 +414,6 @@ public class GUI extends JPanel implements MouseListener, MouseMotionListener, A
 			frame = new Furniture(prv_clk_x - offset_x, prv_clk_y - offset_y, furn.width, furn.length, 0, Move.UP);
 			if(canPlace(lst_clk_x - offset_x, lst_clk_y - offset_y, furn.width, furn.length, tmp_id))
 			{
-//				System.out.println("Can place at: " + (lst_clk_x - offset_x) + ", " + (lst_clk_y - offset_y) + ", " + furn.width + ", " + furn.length + ", " + tmp_id);
 				updateFurniture(tmp_id, lst_clk_x - offset_x, lst_clk_y - offset_y, furn.width, furn.length, frame, false);
 			}
 			else	// collision with another furniture
@@ -559,7 +424,6 @@ public class GUI extends JPanel implements MouseListener, MouseMotionListener, A
 		}
 		
 		paint(getGraphics());
-//		System.out.println("mouseDragged: X = " + lst_clk_x + ", Y = " + lst_clk_y);
 	}
 
 	@Override
@@ -572,7 +436,6 @@ public class GUI extends JPanel implements MouseListener, MouseMotionListener, A
 		fur_create = false;
 		if(e.getSource() == btnCreate) {
 			fur_create = true;
-//			System.out.println("actionPerformed: fur_create = " + fur_create);
 		} else if(e.getSource() == btnDelete) {
 			deleteFurniture(tmp_id);
 		} else if(e.getSource() == btnRotateCW){
@@ -638,12 +501,3 @@ public class GUI extends JPanel implements MouseListener, MouseMotionListener, A
 		return game.getFurnitureById(id);
 	}
 }
-
-
-
-
-
-
-
-
-

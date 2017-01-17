@@ -9,6 +9,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 
+@SuppressWarnings("serial")
 public class SGUI extends JPanel {
 
 	Game game;
