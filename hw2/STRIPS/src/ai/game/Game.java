@@ -1,3 +1,4 @@
+package ai.game;
  import java.awt.Dimension;
 import java.util.Hashtable;
 import java.util.LinkedList;
@@ -42,8 +43,8 @@ public class Game
         initial_state = new State();
         goal_state = new State();
         
-        for(int i = 1; i < 12; i++)
-        	for(int j = 1; j < 20; j++)
+        for(int i = 0; i < 12; i++)
+        	for(int j = 0; j < 20; j++)
         	{
 				initial_state.addPredicate(new PEmpty(i,j));
 				goal_state.addPredicate(new PEmpty(i,j));
@@ -91,6 +92,9 @@ public class Game
 	public int addFurniture(int x, int y, int width, int length) 
 	{
 		int id = goal_board.addFurniture(x, y, width, length);
+		if (id < 0) {
+			return id;
+		}
 		board.addFurniture(x, y, width, length);
 		 
 		initial_state.addPredicate(new PPosition(id, x, y, width, length, Move.UP));
@@ -107,6 +111,9 @@ public class Game
 	// Removes furniture from both boards and updates the states accordingly
 	public void deleteFurniture(int id){
 		Furniture furn = getFurnitureById(id);
+		if (furn == null) {
+			return;
+		}
 		PPosition p = new PPosition(id, furn.cornerx, furn.cornery, furn.width, furn.length, furn.state);
 		
 		goal_state.removePredicate(p);
@@ -155,7 +162,7 @@ public class Game
 		}
 	}
 	
-	public boolean canPlace(int x, int y, int width, int length, int excp_id){
+	public boolean canPlace(int x, int y, int width, int length, int excp_id) {
 		if(goal)
 			return goal_board.canPlace(x, y, width, length, excp_id);
 		else
@@ -173,17 +180,17 @@ public class Game
 	public boolean doMove(int furn_id, Move direction){
 		boolean result;
 		Furniture furn = getFurnitureById(furn_id);
-		if(furn == null)
+		if(furn == null || !canMove(furn, direction)) {
 			return false;
-		
+		}
 		AMove am = new AMove(furn, direction);
 		State pCondList = new State(am.getPreCond());
-
 		if(goal)
 		{
 			pCondList.subtract(goal_state);
-			if(!pCondList.pList.isEmpty())
+			if(!pCondList.pList.isEmpty()) {
 				return false;
+			}
 			goal_state.subtract(am.getDelList());
 			result = goal_board.doMove(furn_id, direction);
 			goal_state.addState(am.getAddList());
@@ -191,8 +198,10 @@ public class Game
 		else
 		{
 			pCondList.subtract(initial_state);
-			if(!pCondList.pList.isEmpty())
+			if(!pCondList.pList.isEmpty()) {
 				return false;
+
+			}
 			initial_state.subtract(am.getDelList());
 			result = board.doMove(furn_id, direction);
 			initial_state.addState(am.getAddList());

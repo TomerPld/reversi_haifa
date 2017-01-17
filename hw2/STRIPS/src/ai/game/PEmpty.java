@@ -1,3 +1,4 @@
+package ai.game;
 
 public class PEmpty extends Predicate {
 	public int x;

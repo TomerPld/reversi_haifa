@@ -1,3 +1,4 @@
+package ai.game;
 public class PPosition extends Predicate {
 	public int furn_id;
 	public int x;

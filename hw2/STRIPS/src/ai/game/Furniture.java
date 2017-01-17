@@ -1,3 +1,4 @@
+package ai.game;
 
 public class Furniture {
 	public int cornerx;

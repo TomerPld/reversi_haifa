@@ -1,3 +1,4 @@
+package ai.game;
 import java.util.LinkedList;
 
 public class ARotate extends Action {

@@ -1,3 +1,4 @@
+package ai.game;
 
 public abstract class Action {
 	public Furniture furn;

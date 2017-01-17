@@ -1,63 +1,83 @@
+package ai.game;
 import java.util.*;
 
 enum Move {UP,RIGHT,DOWN,LEFT};
 
 public class Sboard {
 	
-	private int [][]a = new int [13][25];
+	private int [][]a = new int[12][20];
 	public LinkedList<Integer> listId = new LinkedList<Integer>();
 	public Hashtable<Integer, Furniture> tblFurniture = new Hashtable<Integer, Furniture>();
 	
-	// Constructor - initializes rooms
-	public Sboard()
-	{
-		int i,j;
-		for (i=0;i<13;i++)
-			for(j=0;j<25;j++)
-			{
-				if((i==0) || (j==0) || (i==12) || (j==24) || (i>5 && j>11) || (j==12 && i==1) || (j==12 && i==5))
-					a[i][j] = -1;
-				else
-					a[i][j] = 0;
-			}		
+	/**
+	 * Build the rooms structure.
+	 */
+	public Sboard() {
+		for (int i = 0; i < 12; i++) {
+			for (int j = 0; j < 20; j++) {
+				a[i][j] = 0;
+			}
+		}
 	}
 		
-	// Returns whether a furniture with given dimensions can be placed on board (with an exception for excp_id)
-	public boolean canPlace(int x, int y, int width, int length, int excp_id)
-	{
-		int i,j,flag=0;
-		for(i=0;i<length;i++)
-			for(j=0;j<width;j++)
-			{
-				if((a[i+y][j+x] != 0) && (a[i+y][j+x] != excp_id))
-					flag = 1;	
+    /**
+     * return true if it's possible to place the given furniture in the given place.
+     * @param x
+     * @param y
+     * @param width
+     * @param length
+     * @param furnitureID
+     * @return true if can place.
+     */
+	public boolean canPlace(int x, int y, int width, int length, int furnitureID) {
+		if (x < 0 || x + width > 20 | y < 0 || y + length > 12) {
+			return false;
+		}
+		for (int i = 0; i < length; i++) {
+			for (int j = 0; j < width; j++) {
+				if (a[i+y][j+x] != 0 && a[i+y][j+x] != furnitureID) {
+					return false;
+				}
 			}
-		if(flag == 0)
-			return true;
-		return false;
+		}
+		// Test if not on wall.
+		if (x <= 7 && x + width > 8 && (y + length == 12 || y == 0)) {
+			return false;
+		}
+		if (x <= 7 && x + width > 8 && (y <= 5 && y + length >= 5)) {
+			return false;
+		}
+		if (y <= 4 && y + length > 5 && (x == 1 || x == 0)) {
+			return false;
+		}
+		if (y <= 4 && y + length > 5 && (x <= 7 && x + width >= 7)) {
+			return false;
+		}
+		//if ()
+		return true;
 	}
 	
 	// Adds the given furniture to the array (used in GUI) 
-	public void addFurnitureToArray(Furniture furn)
-	{
-		int i,j;
-		for(i=0;i<furn.length;i++)
-			for(j=0;j<furn.width;j++)
+	private void addFurnitureToArray(Furniture furn)	{
+		for (int i = 0; i < furn.length; i++) {
+			for (int j = 0; j < furn.width; j++) {
 				a[furn.cornery+i][furn.cornerx+j] = furn.id;
+			}
+		}
 	}
 	
 	// Adds the furniture to the data structures (given its dimensions) and updates the array accordingly
-	public int addFurniture(int x, int y, int width, int length)
-	{
+	public int addFurniture(int x, int y, int width, int length) {
 		Furniture furn;
-		if(tblFurniture.isEmpty())
-			listId.add(1);
-		else
-			listId.add(listId.getLast() + 1);
-			
-		if(!canPlace(x,y,width,length,0))
+	    if (!canPlace(x,y,width,length,0)) {
 			return -1;
-		
+	    }
+		if (tblFurniture.isEmpty()) {
+			listId.add(1);
+		}
+		else {
+			listId.add(listId.getLast() + 1);
+		}
 		furn = new Furniture(x,y,width,length,listId.getLast(),Move.UP);
 		tblFurniture.put(furn.id, furn);
 		addFurnitureToArray(furn);
@@ -67,31 +87,32 @@ public class Sboard {
 	// Returns whether the given furniture can move in the given direction
 	public boolean canMove(Furniture furn, Move direction)
 	{
-		if(furn == null)			
+		System.out.println(furn);
+		if (furn == null) {		
 			return false;
-		
+		}
 		int i;
 				
 		switch (direction) {
 		case RIGHT:
-			for(i=0;i<furn.length;i++)
-				if(a[furn.cornery+i][furn.cornerx+furn.width] != 0)
-					return false;
+			if (!canPlace(furn.cornerx, furn.cornery, furn.width + 1, furn.length, furn.id)) {
+				return false;
+			}
 			break;
 		case DOWN:
-			for(i=0;i<furn.width;i++)
-				if(a[furn.cornery+furn.length][furn.cornerx+i] != 0)
-					return false;
+			if (!canPlace(furn.cornerx, furn.cornery, furn.width , furn.length + 1, furn.id)) {
+				return false;
+			}
 			break;
 		case LEFT:
-			for(i=0;i<furn.length;i++)
-				if(a[furn.cornery+i][furn.cornerx-1] != 0)
-					return false;
+			if (!canPlace(furn.cornerx - 1, furn.cornery, furn.width + 1, furn.length, furn.id)) {
+				return false;
+			}
 			break;
 		case UP:
-			for(i=0;i<furn.width;i++)
-				if(a[furn.cornery-1][furn.cornerx+i] != 0)
-					return false;
+			if (!canPlace(furn.cornerx, furn.cornery - 1, furn.width, furn.length + 1, furn.id)) {
+				return false;
+			}
 			break;
 		default:
 			break;
@@ -104,9 +125,9 @@ public class Sboard {
 	{
 		int i;
 		Furniture furn = getFurnitureById(furn_id);
-		if(canMove(furn,direction) == false)
+		if(!canMove(furn,direction)) {
 			return false;
-		
+		}
 		switch (direction) {
 		case RIGHT:
 			for(i=0;i<furn.length;i++)
@@ -253,8 +274,9 @@ public class Sboard {
 	
 	// Returns the array content at the given coordinates (if coordinates are illegal, returns -1)
 	public int getContent(int i, int j) {
-		if((i < 0) || (i > 12) || (j < 0) || (j > 24))
+		if (i < 0 || i > 11 || j < 0 || j > 19) {
 			return -1;
+		}
 		return a[i][j];
 	}
 
