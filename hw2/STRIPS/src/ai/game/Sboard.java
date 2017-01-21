@@ -90,9 +90,7 @@ public class Sboard {
 		System.out.println(furn);
 		if (furn == null) {		
 			return false;
-		}
-		int i;
-				
+		}				
 		switch (direction) {
 		case RIGHT:
 			if (!canPlace(furn.cornerx, furn.cornery, furn.width + 1, furn.length, furn.id)) {
@@ -199,62 +197,7 @@ public class Sboard {
 			return false;
 		Furniture tmp = new Furniture(furn);
 		tmp.rotate(clockwise);
-		int min_x, max_x;
-		int min_y, max_y;
-		int min_length, max_length;
-		int min_width, max_width;
-		boolean cond;
-		
-		min_x		= Math.min(furn.cornerx, tmp.cornerx);
-		max_x		= Math.max(furn.cornerx, tmp.cornerx);
-		min_y		= Math.min(furn.cornery, tmp.cornery);
-		max_y		= Math.max(furn.cornery, tmp.cornery);
-		min_length	= Math.min(furn.length , tmp.length);
-		max_length	= Math.max(furn.length , tmp.length);
-		min_width	= Math.min(furn.width  , tmp.width);
-		max_width	= Math.max(furn.width  , tmp.width);
-		
-		cond = (furn.length > furn.width);
-		
-		if((clockwise && cond) || (!clockwise && !cond))	// upper right and lower left
-		{
-			for(int i = min_y; i < max_y + min_length; i++)
-			{
-				for(int j = max_x + (i < max_y ? 0 : min_width); j < min_x + max_width; j++)
-				{
-					if((a[i][j] != 0) && (a[i][j] != furn.id))
-						return false;
-				}
-			}
-			for(int i = max_y; i < min_y + max_length; i++)
-			{
-				for(int j = min_x; j < max_x + (i < (max_y + min_length) ? 0 : min_width); j++)
-				{
-					if((a[i][j] != 0) && (a[i][j] != furn.id))
-						return false;
-				}
-			}
-		}
-		else												// upper left and lower right
-		{
-			for(int i = min_y; i < max_y + min_length; i++)
-			{
-				for(int j = min_x; j < max_x + (i < max_y ? min_width : 0); j++)
-				{
-					if((a[i][j] != 0) && (a[i][j] != furn.id))
-						return false;
-				}
-			}
-			for(int i = max_y; i < min_y + max_length; i++)
-			{
-				for(int j = max_x + (i < (max_y + min_length) ? min_width : 0); j < min_x + max_width; j++)
-				{
-					if((a[i][j] != 0) && (a[i][j] != furn.id))
-						return false;
-				}
-			}
-		}
-		return true;
+		return canPlace(tmp.cornerx, tmp.cornery, tmp.width, tmp.length, tmp.id);
 	}
 	
 	// Rotates the furniture with the given identifier in the given direction (cw/ccw)

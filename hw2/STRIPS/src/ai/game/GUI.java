@@ -396,7 +396,7 @@ public class GUI extends JPanel implements MouseListener, MouseMotionListener, A
 		} else if(e.getSource() == btnRotateCW){
 			game.doRotate(tmp_id, true);
 		} else if(e.getSource() == btnRotateCCW){
-			game.doRotate(tmp_id, false);
+			game.doRotate(tmp_id, true);
 		} else if(e.getSource() == btnMoveRight){
 			game.doMove(tmp_id, Move.RIGHT);
 		} else if(e.getSource() == btnMoveDown){
