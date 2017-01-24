@@ -1,4 +1,4 @@
-package ai.game;
+package core;
  import java.awt.Dimension;
 import java.util.Hashtable;
 import java.util.LinkedList;
@@ -7,12 +7,15 @@ import java.util.Stack;
 
 import javax.swing.JFrame;
 
+import gui.GUI;
+import gui.SGUI;
+
 
 public class Game
 {
 	GUI gui;
 	SGUI sgui;
-	LinkedList<Action> listAction = new LinkedList<Action>();
+	public LinkedList<Action> listAction = new LinkedList<Action>();
 	LinkedList<Integer> listStateId = new LinkedList<Integer>();
 	LinkedList<State> listState = new LinkedList<State>();
 	LinkedList<State> listBannedState = new LinkedList<State>();
@@ -97,24 +100,24 @@ public class Game
 		}
 		board.addFurniture(x, y, width, length);
 		 
-		initial_state.addPredicate(new PPosition(id, x, y, width, length, Move.UP));
-		goal_state.addPredicate(new PPosition(id, x, y, width, length, Move.UP));
-		for(int i = y; i < y + length; i++)
-			for(int j = x; j < x + width; j++)
-			{
+		initial_state.addPredicate(new PPosition(new Furniture(x, y, width, length, id, Direction.UP)));
+		goal_state.addPredicate(new PPosition(new Furniture(x, y, width, length, id, Direction.UP)));
+		for(int i = y; i < y + length; i++) {
+			for(int j = x; j < x + width; j++) {
 				initial_state.removePredicate(new PEmpty(i,j));
 				goal_state.removePredicate(new PEmpty(i,j));
 			}
+		}
 		return id;
 	}
 
 	// Removes furniture from both boards and updates the states accordingly
-	public void deleteFurniture(int id){
+	public void deleteFurniture(int id ){
 		Furniture furn = getFurnitureById(id);
 		if (furn == null) {
 			return;
 		}
-		PPosition p = new PPosition(id, furn.cornerx, furn.cornery, furn.width, furn.length, furn.state);
+		PPosition p = new PPosition(furn);
 		
 		goal_state.removePredicate(p);
 		initial_state.removePredicate(p);
@@ -132,7 +135,7 @@ public class Game
 	// Updates furniture in goal + initial(both==true) boards and updates the states accordingly
 	public void updateFurniture(int id, int x, int y, int width, int length, Furniture frame, boolean both){
 		Furniture furn = goal_board.getFurnitureById(id);
-		PPosition p = new PPosition(id, furn.cornerx, furn.cornery, furn.width, furn.length, furn.state);
+		PPosition p = new PPosition(furn);
 		goal_state.removePredicate(p);
 		for(int i = furn.cornery; i < furn.cornery + furn.length; i++)
 			for(int j = furn.cornerx; j < furn.cornerx + furn.width; j++)
@@ -140,14 +143,13 @@ public class Game
 		
 		goal_board.updateFurniture(id, x, y, width, length, frame);
 		
-		goal_state.addPredicate(new PPosition(id, furn.cornerx, furn.cornery, furn.width, furn.length, furn.state));
+		goal_state.addPredicate(new PPosition(furn));
 		for(int i = furn.cornery; i < furn.cornery + furn.length; i++)
 			for(int j = furn.cornerx; j < furn.cornerx + furn.width; j++)
 				goal_state.removePredicate(new PEmpty(i,j));
 		
 		if(both)
 		{
-			furn = board.getFurnitureById(id);
 			initial_state.removePredicate(p);
 			for(int i = furn.cornery; i < furn.cornery + furn.length; i++)
 				for(int j = furn.cornerx; j < furn.cornerx + furn.width; j++)
@@ -155,7 +157,7 @@ public class Game
 			
 			board.updateFurniture(id, x, y, width, length, frame);
 			
-			initial_state.addPredicate(new PPosition(id, furn.cornerx, furn.cornery, furn.width, furn.length, furn.state));
+			initial_state.addPredicate(new PPosition(furn));
 			for(int i = furn.cornery; i < furn.cornery + furn.length; i++)
 				for(int j = furn.cornerx; j < furn.cornerx + furn.width; j++)
 					initial_state.removePredicate(new PEmpty(i,j));
@@ -169,15 +171,17 @@ public class Game
 			return board.canPlace(x, y, width, length, excp_id);
 	}
 	
-	public boolean canMove(Furniture furn, Move direction){
-		if(goal)
+	public boolean canMove(Furniture furn, Direction direction) {
+		if(goal) {
 			return goal_board.canMove(furn, direction);
-		else
+		}
+		else {
 			return board.canMove(furn, direction);
+		}
 	}
 	
 	// Move the furniture with the given identifier in the given direction (in the appropriate board) and update the state accordingly
-	public boolean doMove(int furn_id, Move direction){
+	public boolean doMove(int furn_id, Direction direction){
 		boolean result;
 		Furniture furn = getFurnitureById(furn_id);
 		if(furn == null || !canMove(furn, direction)) {
@@ -209,7 +213,7 @@ public class Game
 		return result;
 	}
 
-	public boolean canRotate(Furniture furn, boolean clockwise){
+	public boolean canRotate(Furniture furn, RotationDirection clockwise){
 		if(goal)
 			return goal_board.canRotate(furn, clockwise);
 		else
@@ -217,7 +221,7 @@ public class Game
 	}
 	
 	// Rotate the furniture with the given identifier in the given direction (in the appropriate board) and update the state accordingly
-	public boolean doRotate(int furn_id, boolean cw) {
+	public boolean doRotate(int furn_id, RotationDirection cw) {
 		boolean result;
 		Furniture furn = getFurnitureById(furn_id);
 		if(furn == null)
@@ -349,13 +353,13 @@ public class Game
 			{
 				int pref;
 				pp = (PPosition)p;
-				Furniture furn = new Furniture(pp.x, pp.y, pp.width, pp.length, pp.furn_id, pp.state);
-				Action[] act_array =    {new AMove	(furn, Move.RIGHT),
-										 new AMove	(furn, Move.DOWN ),
-										 new AMove	(furn, Move.LEFT ),
-										 new AMove	(furn, Move.UP	 ),
-										 new ARotate(furn, true		 ),
-										 new ARotate(furn, false	 )};
+				Furniture furn = new Furniture(pp.getFurniture());
+				Action[] act_array =    {new AMove	(furn, Direction.RIGHT),
+										 new AMove	(furn, Direction.DOWN),
+										 new AMove	(furn, Direction.LEFT),
+										 new AMove	(furn, Direction.UP),
+										 new ARotate(furn, RotationDirection.CW),
+										 new ARotate(furn, RotationDirection.CCW)};
 				
 				
 				// transform act_array into a list of actions
@@ -387,7 +391,7 @@ public class Game
 						Predicate tmp_p = preCond.pList.get(k);
 						if(tmp_p.getClass() == PEmpty.class)
 						{
-							if(getContent(((PEmpty)tmp_p).y, ((PEmpty)tmp_p).x) == -1)	// wall is not empty
+							if(getContent(((PEmpty)tmp_p).getY(), ((PEmpty)tmp_p).getX()) == -1)	// wall is not empty
 								flag = false;
 						}
 					}
@@ -428,36 +432,31 @@ public class Game
 		unMetPreCond.subtract(s);
 		sum += 5 * unMetPreCond.pList.size();
 		
-		pp1 = (PPosition) s.pList.get(s.contains(a.furn.id));
-		pp2 = (PPosition) tmp_goal.pList.get(tmp_goal.contains(a.furn.id));
+		pp1 = (PPosition) s.pList.get(s.contains(a.getFurniture().id));
+		pp2 = (PPosition) tmp_goal.pList.get(tmp_goal.contains(a.getFurniture().id));
 				
 		// touching an already perfectly positioned furniture might be a bad idea
-		if(getPosDiff(pp1, pp2) + getStateDiff(pp1.state, pp2.state) == 0)
-		{
+		if(getPosDiff(pp1, pp2) + getStateDiff(pp1.getFurniture().state, pp2.getFurniture().state) == 0) {
 			sum += 100;
 		}
 		// calculate differences between each furniture's current position and its goal position 
-		for(int i = 0; i < tmp_state.pList.size() ; i++)
-		{
+		for(int i = 0; i < tmp_state.pList.size() ; i++) {
 			int j = 0;
 			p1 = tmp_state.pList.get(i);
-			if(p1.getClass() == PPosition.class)	// diff is only relevant to PPosition
-			{
+			if(p1.getClass() == PPosition.class) {
 				flag = true;
-				while(j < tmp_goal.pList.size() && flag)
-				{
+				while(j < tmp_goal.pList.size() && flag) {
 					p2 = tmp_goal.pList.get(j);
-					if((p1.getClass() == p2.getClass()) && (((PPosition)p1).furn_id == ((PPosition)p2).furn_id))
-					{
+					if((p1.getClass() == p2.getClass()) && (((PPosition)p1).getFurniture().id == ((PPosition)p2).getFurniture().id)) {
 						flag = false;
 					}
-					else
+					else {
 						j++;
+					}
 				}
-				if(j < tmp_goal.pList.size()) // matching PPosition was found
-				{
+				if(j < tmp_goal.pList.size()) {
 					diff = getPosDiff((PPosition)p1, (PPosition)p2);
-					diff += getStateDiff(((PPosition)p1).state,((PPosition)p2).state);
+					diff += getStateDiff(((PPosition)p1).getFurniture().state,((PPosition)p2).getFurniture().state);
 					if(diff == 0)	// a furniture is positioned perfectly
 						diff = -10;
 					sum += 10 * diff;
@@ -468,24 +467,24 @@ public class Game
 		return sum;
 	}
 
-	// Returns the positional difference between two PPositions - based on dimensions 
+	// TODO check if correct
 	private int getPosDiff(PPosition p1, PPosition p2) {
+		Furniture furniture1 = p1.getFurniture();
+		Furniture furniture2 = p2.getFurniture();
 		int diff_x, diff_y;
 		
 		double center_x1, center_x2;
 		double center_y1, center_y2;
 		
-		center_x1 = p1.x + (p1.width  / 2.0);
-		center_y1 = p1.y + (p1.length / 2.0);
-		center_x2 = p2.x + (p2.width  / 2.0);
-		center_y2 = p2.y + (p2.length / 2.0);
+		center_x1 = furniture1.cornerx + (furniture1.width  / 2.0);
+		center_y1 = furniture1.cornery + (furniture1.length / 2.0);
+		center_x2 = furniture2.cornerx + (furniture2.width  / 2.0);
+		center_y2 = furniture2.cornery + (furniture2.length / 2.0);
 		
 		diff_x = (int) Math.abs(center_x1 - center_x2);
 		diff_y = (int) Math.abs(center_y1 - center_y2);
 		
-		if((p1.x < 12 && p2.x >= 12) || (p1.x >= 12 && p2.x < 12))
-		{
-			// add distance towards door
+		if((furniture1.cornerx < 12 && furniture2.cornerx >= 12) || (furniture1.cornerx >= 12 && furniture2.cornerx < 12)) {
 			if(center_y1 < 2 && center_y2 < 2)		// both above the door
 				diff_y = (int) (Math.abs(center_y1 - 2) + Math.abs(center_y2 - 2)); 
 			if(center_y1 > 4 && center_y2 > 4)		// both under the door
@@ -496,24 +495,24 @@ public class Game
 	}
 
 	// Returns the directional difference between two PPositions - based on state 
-	private int getStateDiff(Move s1, Move s2) {
+	private int getStateDiff(Direction s1, Direction s2) {
 		if(s1 == s2)
 			return 0;
 		switch (s1) {
 		case RIGHT:
-			if(s2 == Move.UP || s2 == Move.DOWN)
+			if(s2 == Direction.UP || s2 == Direction.DOWN)
 				return 1;
 			break;
 		case DOWN:
-			if(s2 == Move.RIGHT || s2 == Move.LEFT)
+			if(s2 == Direction.RIGHT || s2 == Direction.LEFT)
 				return 1;
 			break;
 		case LEFT:
-			if(s2 == Move.DOWN || s2 == Move.UP)
+			if(s2 == Direction.DOWN || s2 == Direction.UP)
 				return 1;
 			break;
 		case UP:
-			if(s2 == Move.LEFT || s2 == Move.RIGHT)
+			if(s2 == Direction.LEFT || s2 == Direction.RIGHT)
 				return 1;
 			break;
 		}
@@ -568,10 +567,10 @@ public class Game
 				if(perform)		// if we wish to display changes in board on-the-run
 					if(item.getClass() == AMove.class) {
 						AMove am = (AMove) a;
-						board.doMove(a.furn.id, am.direction);
+						board.doMove(a.getFurniture().id, am.getDirection());
 					} else if(item.getClass() == ARotate.class)	{
 						ARotate ar = (ARotate) a;
-						board.doRotate(a.furn.id, ar.clockwise);
+						board.doRotate(a.getFurniture().id, ar.getRotationDirection());
 					}
 				
 				// apply the action to the current state
@@ -651,18 +650,10 @@ public class Game
 	// Returns the reverse action to a (an action which cancels it)
 	private Action getReverseAction(Action a) {
 		if(a.getClass() == AMove.class) {
-			switch (((AMove)a).direction) {
-			case RIGHT:
-				return new AMove(a.furn, Move.LEFT);
-			case DOWN:
-				return new AMove(a.furn, Move.UP);
-			case LEFT:
-				return new AMove(a.furn, Move.RIGHT);
-			case UP:
-				return new AMove(a.furn, Move.DOWN);
-			}
+			AMove move = (AMove)a;
+			return new AMove(move.getFurniture(), Direction.getOpposite(move.getDirection()));
 		} else if(a.getClass() == ARotate.class) {
-			return new ARotate(a.furn, !((ARotate)a).clockwise);
+			return new ARotate(a.getFurniture(), RotationDirection.getOpposite(((ARotate)a).getRotationDirection()));
 		}
 		return null;
 	}
@@ -678,8 +669,8 @@ public class Game
 		{
 			index = rand.nextInt(tmp.pList.size());
 			Predicate p = tmp.pList.remove(index);
-			p.p_id = s.size();
-			p.act_list_size = listAction.size();
+			p.setId(s.size());
+			p.setListSize(listAction.size());
 			s.push(p);
 		}
 	}
@@ -705,9 +696,9 @@ public class Game
 		{
 			a = listAction.get(i);
 			if(a.getClass() == AMove.class)
-				board.doMove(a.furn.id, ((AMove)a).direction);
+				board.doMove(a.getFurniture().id, ((AMove)a).getDirection());
 			else if(a.getClass() == ARotate.class)
-				board.doRotate(a.furn.id, ((ARotate)a).clockwise);
+				board.doRotate(a.getFurniture().id, ((ARotate)a).getRotationDirection());
 			
 			gui.paint(gui.getGraphics());
 		}

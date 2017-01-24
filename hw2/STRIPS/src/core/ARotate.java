@@ -1,17 +1,19 @@
-package ai.game;
+package core;
 import java.util.LinkedList;
 
 public class ARotate extends Action {
-	public boolean clockwise;
+	private RotationDirection rotationDirection;
 
 	// Constructor, gets: furn - the furn on which the action is applied, cw - the rotation direction
-	public ARotate(Furniture furn, boolean cw) {
+	public ARotate(Furniture furn, RotationDirection rotationDirection) {
 		super(furn);
+		this.rotationDirection = rotationDirection;
+
 		LinkedList<Predicate> list1, list2;
-		PPosition pp = new PPosition(furn.id, furn.cornerx, furn.cornery, furn.width, furn.length, furn.state);
+		PPosition pp = new PPosition(furn);
 		
 		Furniture tmp = new Furniture(furn);
-		tmp.rotate(cw);
+		tmp.rotate(rotationDirection);
 		int min_x, max_x;
 		int min_y, max_y;
 		int min_length, max_length;
@@ -34,7 +36,7 @@ public class ARotate extends Action {
 		list1 = new LinkedList<Predicate>();
 		list1.add(pp);
 				
-		if(cw)	// rotate clockwise
+		if(RotationDirection.CW.equals(rotationDirection))	// rotate clockwise
 			if(cond)	// upper right and lower left
 			{
 				// upper right
@@ -93,7 +95,7 @@ public class ARotate extends Action {
 
 		// list2 is now dedicated to the action's add list
 		list2 = new LinkedList<Predicate>();
-		list2.add(new PPosition(tmp.id, tmp.cornerx, tmp.cornery, tmp.width, tmp.length, tmp.state));
+		list2.add(new PPosition(tmp));
 		
 		for(int j = max_x; j < max_x + min_width; j++)
 		{
@@ -131,21 +133,22 @@ public class ARotate extends Action {
 		
 		super.setDelList(new State(list1));
 		super.setAddList(new State(list2));
-
-		clockwise = cw;
 	}
 
-	// Returns the action's string representation
+	public RotationDirection getRotationDirection() {
+		return this.rotationDirection;
+	}
+
 	@Override
 	public String toString()
 	{
-		return "Rotate " + (clockwise ? "" : "C") + "CW " + super.furn; 
+		return "Rotate " + (RotationDirection.CW.equals(rotationDirection) ? "" : "C") + "CW " + this.getFurniture(); 
 	}	
 
 	// Returns whether this (rotating action) equals to ar (given rotating action)
 	public boolean equals(ARotate ar)
 	{
-		if((furn.id == ar.furn.id) && (clockwise == ar.clockwise))
+		if((this.getFurniture().id == ar.getFurniture().id) && (rotationDirection == ar.getRotationDirection()))
 			return true;
 		return false;
 	}

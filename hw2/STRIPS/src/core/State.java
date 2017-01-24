@@ -1,4 +1,4 @@
-package ai.game;
+package core;
 import java.util.LinkedList;
 
 public class State {
@@ -65,12 +65,10 @@ public class State {
 	}
 	
 	// Returns the index in which a Predicate is found which equals the given predicate p (if not found - returns (-1))
-	public int contains(Predicate p)
-	{
+	public int contains(Predicate p) {
 		Predicate pr;
 		for(int i = 0; i < pList.size(); i++)
-			if((pr = pList.get(i)).getClass() == p.getClass())
-			{
+			if((pr = pList.get(i)).getClass() == p.getClass()) {
 				if(p.getClass() == PPosition.class)
 					if(((PPosition)p).equals((PPosition)pr))
 						return i;
@@ -81,13 +79,13 @@ public class State {
 		return -1;
 	}
 	
-	// Returns the index in which a PPosition predicate with the given furn_id is found (if not found - returns (-1))
-	public int contains(int furn_id)
-	{
+	public int contains(int furnitureId) {
 		Predicate pr;
-		for(int i = 0; i < pList.size(); i++)
-			if(((pr = pList.get(i)).getClass() == PPosition.class) && (((PPosition)pr).furn_id == furn_id))
+		for(int i = 0; i < pList.size(); i++) {
+			if(((pr = pList.get(i)).getClass() == PPosition.class) && (((PPosition)pr).getFurniture().id == furnitureId)) {
 				return i;
+			}
+		}
 		return -1;
 	}
 	

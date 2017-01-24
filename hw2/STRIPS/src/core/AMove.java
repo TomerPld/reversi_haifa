@@ -1,51 +1,51 @@
-package ai.game;
+package core;
 import java.util.LinkedList;
 
 
 public class AMove extends Action {
-	public Move direction;
+	private Direction direction;
 	
 	// Constructor, gets: furn - the furn on which the action is applied, dir - the move direction
-	public AMove(Furniture furn, Move dir)
-	{
-		super(furn);
-		int i;
+	public AMove(Furniture furniture, Direction direction) {
+		super(furniture);
+		this.direction = direction;
 		LinkedList<Predicate> list1, list2;
-		PPosition pp = new PPosition(furn.id, furn.cornerx, furn.cornery, furn.width, furn.length, furn.state);
+		Furniture furn = this.getFurniture();
+		PPosition pp = new PPosition(furn);
 
 		list1 = new LinkedList<Predicate>();
-		list1.add(new PPosition(furn.id, furn.cornerx, furn.cornery, furn.width, furn.length, furn.state));
+		list1.add(new PPosition(furn));
 				
 		list2 = new LinkedList<Predicate>();
 
-		switch (dir) {
+		switch (direction) {
 		case RIGHT:
-			pp.x++;
-			for(i = 0; i < furn.length; i++)
+			pp.getFurniture().cornerx++;
+			for(int i = 0; i < furn.length; i++)
 			{
 				list1.add(new PEmpty(furn.cornery + i, furn.cornerx + furn.width));
 				list2.add(new PEmpty(furn.cornery + i, furn.cornerx));
 			}
 			break;
 		case DOWN:
-			pp.y++;
-			for(i = 0; i < furn.width; i++)
+			pp.getFurniture().cornery++;
+			for(int i = 0; i < furn.width; i++)
 			{
 				list1.add(new PEmpty(furn.cornery + furn.length, furn.cornerx + i));
 				list2.add(new PEmpty(furn.cornery, furn.cornerx + i));
 			}
 			break;
 		case LEFT:
-			pp.x--;
-			for(i = 0; i < furn.length; i++)
+			pp.getFurniture().cornerx--;
+			for(int i = 0; i < furn.length; i++)
 			{
 				list1.add(new PEmpty(furn.cornery + i, furn.cornerx - 1));
 				list2.add(new PEmpty(furn.cornery + i, furn.cornerx + furn.width - 1));
 			}
 			break;
 		case UP:
-			pp.y--;
-			for(i = 0; i < furn.width; i++)
+			pp.getFurniture().cornery--;
+			for(int i = 0; i < furn.width; i++)
 			{
 				list1.add(new PEmpty(furn.cornery - 1, furn.cornerx + i));
 				list2.add(new PEmpty(furn.cornery + furn.length - 1, furn.cornerx + i));
@@ -58,21 +58,20 @@ public class AMove extends Action {
 		
 		list2.add(pp);
 		super.setAddList(new State(list2));
-				
-		direction = dir;
 	}
-	
-	// Returns the action's string representation
+
+	public Direction getDirection() {
+		return this.direction;
+	}
+
 	@Override
-	public String toString()
-	{
-		return "Move " + direction + " " + super.furn; 
+	public String toString() {
+		return "Move " + direction + " " + getFurniture().toString(); 
 	}
 	
 	// Returns whether this (moving action) equals to am (given moving action)
-	public boolean equals(AMove am)
-	{
-		if((furn.id == am.furn.id) && (direction == am.direction))
+	public boolean equals(AMove am) {
+		if((getFurniture().id == am.getFurniture().id) && (direction == am.direction))
 			return true;
 		return false;
 	}

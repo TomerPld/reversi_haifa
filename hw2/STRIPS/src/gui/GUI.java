@@ -1,4 +1,4 @@
-package ai.game;
+package gui;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -14,6 +14,11 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextArea;
+
+import core.Direction;
+import core.Furniture;
+import core.Game;
+import core.RotationDirection;
 
 
 @SuppressWarnings("serial")
@@ -359,14 +364,14 @@ public class GUI extends JPanel implements MouseListener, MouseMotionListener, A
 			}
 			
 			// if selection got smaller, must repaint background
-			frame = new Furniture(Math.min(prv_clk_x, prs_x), Math.min(prv_clk_y, prs_y), prv_diff_x + 1, prv_diff_y + 1, 0, Move.UP);
+			frame = new Furniture(Math.min(prv_clk_x, prs_x), Math.min(prv_clk_y, prs_y), prv_diff_x + 1, prv_diff_y + 1, 0, Direction.UP);
 			
 			game.updateFurniture(tmp_id, Math.min(lst_clk_x, prs_x), Math.min(lst_clk_y, prs_y), lst_diff_x + 1, lst_diff_y + 1, frame, true);
 		}
 		else if(game.goal)	// setting a new goal location 
 		{
 			Furniture furn = game.getFurnitureById(tmp_id);
-			frame = new Furniture(prv_clk_x - offset_x, prv_clk_y - offset_y, furn.width, furn.length, 0, Move.UP);
+			frame = new Furniture(prv_clk_x - offset_x, prv_clk_y - offset_y, furn.width, furn.length, 0, Direction.UP);
 			if(game.canPlace(lst_clk_x - offset_x, lst_clk_y - offset_y, furn.width, furn.length, tmp_id))
 			{
 				game.updateFurniture(tmp_id, lst_clk_x - offset_x, lst_clk_y - offset_y, furn.width, furn.length, frame, false);
@@ -394,17 +399,17 @@ public class GUI extends JPanel implements MouseListener, MouseMotionListener, A
 		} else if(e.getSource() == btnDelete) {
 			game.deleteFurniture(tmp_id);
 		} else if(e.getSource() == btnRotateCW){
-			game.doRotate(tmp_id, true);
+			game.doRotate(tmp_id, RotationDirection.CW);
 		} else if(e.getSource() == btnRotateCCW){
-			game.doRotate(tmp_id, true);
+			game.doRotate(tmp_id, RotationDirection.CCW);
 		} else if(e.getSource() == btnMoveRight){
-			game.doMove(tmp_id, Move.RIGHT);
+			game.doMove(tmp_id, Direction.RIGHT);
 		} else if(e.getSource() == btnMoveDown){
-			game.doMove(tmp_id, Move.DOWN);
+			game.doMove(tmp_id, Direction.DOWN);
 		} else if(e.getSource() == btnMoveLeft){
-			game.doMove(tmp_id, Move.LEFT);
+			game.doMove(tmp_id, Direction.LEFT);
 		} else if(e.getSource() == btnMoveUp){
-			game.doMove(tmp_id, Move.UP);
+			game.doMove(tmp_id, Direction.UP);
 		} else if(e.getSource() == btnSwitchDisp){
 			game.goal = !game.goal;
 			if(game.goal){

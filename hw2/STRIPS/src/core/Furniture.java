@@ -1,4 +1,4 @@
-package ai.game;
+package core;
 
 public class Furniture {
 	public int cornerx;
@@ -6,11 +6,10 @@ public class Furniture {
 	public int length;
 	public int width;
 	public int id;
-	public Move state;
+	public Direction state;
 	
 	// Constructor - gets: x - distance from left, y - distance from top, wid - width, len - length, identifier - used in Hashtable, s - state(RIGHT/DOWN/LEFT/UP)
-	public Furniture(int x, int y, int wid, int len, int identifier, Move s)
-	{
+	public Furniture(int x, int y, int wid, int len, int identifier, Direction s) {
 		cornerx = x;
 		cornery = y;
 		length	= len;
@@ -20,8 +19,7 @@ public class Furniture {
 	}
 	
 	// Copy constructor
-	public Furniture(Furniture f)
-	{
+	public Furniture(Furniture f) {
 		cornerx = f.cornerx;
 		cornery = f.cornery;
 		length	= f.length;
@@ -31,61 +29,51 @@ public class Furniture {
 	}
 	
 	// Rotates the furniture cw/ccw and updates its fields
-	public void rotate(boolean clockwise)
-	{
+	public void rotate(RotationDirection clockwise) {
 		double x,y;
 		int temp;
 		
 		x = cornerx + (width/2.0) - (length/2.0);
 		y = cornery + (length/2.0) - (width/2.0);
 		
-		if((width + length)%2 == 1)
-		{
+		if((width + length)%2 == 1) {
 			switch (state) {
 			case RIGHT:
-				if(clockwise)
-				{
+				if(RotationDirection.CW.equals(clockwise)) {
 					x -= 0.5;
 					y += 0.5;
 				}
-				else
-				{
+				else {
 					x -= 0.5;
 					y -= 0.5;
 				}
 				break;
 			case DOWN:
-				if(clockwise)
-				{
+				if(RotationDirection.CW.equals(clockwise)) {
 					x -= 0.5;
 					y -= 0.5;
 				}
-				else
-				{
+				else {
 					x += 0.5;
 					y -= 0.5;
 				}
 				break;
 			case LEFT:
-				if(clockwise)
-				{
+				if(RotationDirection.CW.equals(clockwise)) {
 					x += 0.5;
 					y -= 0.5;
 				}
-				else
-				{
+				else {
 					x += 0.5;
 					y += 0.5;
 				}
 				break;
 			case UP:
-				if(clockwise)
-				{
+				if(RotationDirection.CW.equals(clockwise)) {
 					x += 0.5;
 					y += 0.5;
 				}
-				else
-				{
+				else {
 					x -= 0.5;
 					y += 0.5;
 				}
@@ -94,18 +82,18 @@ public class Furniture {
 		}
 		
 		switch (state) {
-		case RIGHT:
-			state = clockwise ? Move.DOWN : Move.UP;
-			break;
-		case DOWN:
-			state = clockwise ? Move.LEFT : Move.RIGHT;
-			break;
-		case LEFT:
-			state = clockwise ? Move.UP : Move.DOWN;
-			break;
-		case UP:
-			state = clockwise ? Move.RIGHT : Move.LEFT;
-			break;
+			case RIGHT:
+				state = RotationDirection.CW.equals(clockwise) ? Direction.DOWN : Direction.UP;
+				break;
+			case DOWN:
+				state = RotationDirection.CW.equals(clockwise) ? Direction.LEFT : Direction.RIGHT;
+				break;
+			case LEFT:
+				state = RotationDirection.CW.equals(clockwise) ? Direction.UP : Direction.DOWN;
+				break;
+			case UP:
+				state = RotationDirection.CW.equals(clockwise) ? Direction.RIGHT : Direction.LEFT;
+				break;
 		}
 
 		cornerx = (int) x;
@@ -117,8 +105,7 @@ public class Furniture {
 	}
 	
 	// Returns whether this (furniture) equals furn (given furniture)
-	public boolean equals(Furniture furn)
-	{
+	public boolean equals(Furniture furn) {
 		if(	(cornerx != furn.cornerx) || (cornery != furn.cornery) || (width != furn.width)	||
 			(length	 != furn.length)  || (id	  != furn.id)	   || (state != furn.state)    )
 			return false;

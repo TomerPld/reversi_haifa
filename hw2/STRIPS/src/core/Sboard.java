@@ -1,7 +1,5 @@
-package ai.game;
+package core;
 import java.util.*;
-
-enum Move {UP,RIGHT,DOWN,LEFT};
 
 public class Sboard {
 	
@@ -78,14 +76,14 @@ public class Sboard {
 		else {
 			listId.add(listId.getLast() + 1);
 		}
-		furn = new Furniture(x,y,width,length,listId.getLast(),Move.UP);
+		furn = new Furniture(x,y,width,length,listId.getLast(),Direction.UP);
 		tblFurniture.put(furn.id, furn);
 		addFurnitureToArray(furn);
 		return furn.id;
 	}
 	
 	// Returns whether the given furniture can move in the given direction
-	public boolean canMove(Furniture furn, Move direction)
+	public boolean canMove(Furniture furn, Direction direction)
 	{
 		System.out.println(furn);
 		if (furn == null) {		
@@ -119,7 +117,7 @@ public class Sboard {
 	}
 	
 	// Moves the furniture with the given identifier in the given direction (if possible)
-	public boolean doMove(int furn_id, Move direction)
+	public boolean doMove(int furn_id, Direction direction)
 	{
 		int i;
 		Furniture furn = getFurnitureById(furn_id);
@@ -191,17 +189,18 @@ public class Sboard {
 	}
 	
 	// Returns whether the given furniture can be rotated in the given direction (cw/ccw)
-	public boolean canRotate(Furniture furn, boolean clockwise)
+	public boolean canRotate(Furniture furn, RotationDirection clockwise)
 	{
-		if(furn == null)
+		if (furn == null) {
 			return false;
+		}
 		Furniture tmp = new Furniture(furn);
 		tmp.rotate(clockwise);
 		return canPlace(tmp.cornerx, tmp.cornery, tmp.width, tmp.length, tmp.id);
 	}
 	
 	// Rotates the furniture with the given identifier in the given direction (cw/ccw)
-	public boolean doRotate(int furn_id, boolean clockwise)
+	public boolean doRotate(int furn_id, RotationDirection clockwise)
 	{
 		Furniture furn = getFurnitureById(furn_id);
 		if(canRotate(furn, clockwise))
